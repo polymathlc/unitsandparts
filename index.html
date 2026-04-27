@@ -1,0 +1,3683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simultaneous Concept Explorer — P6 Math</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================================================
+       1. DESIGN TOKENS  (Polymath Math — soft green accent)
+       ========================================================= */
+    :root {
+      /* Surface & Background */
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #FAFAFA;
+      --bg-tertiary: #F3F3F0;
+      --bg-soft: #FBFCF9;
+      --border-subtle: #E8E8E4;
+      --border-medium: #D4D4CF;
+
+      /* Text */
+      --text-primary: #1A1A1A;
+      --text-secondary: #5C5C5C;
+      --text-tertiary: #8A8A8A;
+      --text-inverse: #FFFFFF;
+
+      /* Math accent — soft green */
+      --accent-light: #C8E6C9;
+      --accent-base: #81C784;
+      --accent-dark: #66BB6A;
+      --accent-deep: #43A047;
+      --accent-bg: #F1F8E9;
+
+      /* Highlight palette for question fact tagging */
+      --hl-1-bg: #FFF4D6;
+      --hl-1-border: #F4C95A;
+      --hl-1-deep: #C99A2D;
+
+      --hl-2-bg: #E1F0FF;
+      --hl-2-border: #6FB1F0;
+      --hl-2-deep: #2872C2;
+
+      --hl-3-bg: #FCE4EC;
+      --hl-3-border: #F48FB1;
+      --hl-3-deep: #C2185B;
+
+      --hl-ask-bg: #E8F5E9;
+      --hl-ask-border: #66BB6A;
+      --hl-ask-deep: #2E7D32;
+
+      /* Equation block colors — emphasise items in equations */
+      --item-a-bg: #FFF4D6;
+      --item-a-border: #F4C95A;
+      --item-a-text: #6E5410;
+
+      --item-b-bg: #E1F0FF;
+      --item-b-border: #6FB1F0;
+      --item-b-text: #1B4F84;
+
+      --item-value-bg: #F1F8E9;
+      --item-value-border: #A5D6A7;
+      --item-value-text: #1B5E20;
+
+      /* Shadows */
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.05), 0 6px 20px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 30px rgba(0, 0, 0, 0.10);
+      --shadow-button: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.12);
+      --shadow-glow: 0 0 0 4px rgba(129, 199, 132, 0.18);
+
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 40px;
+      --space-2xl: 64px;
+
+      /* Radii */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --radius-full: 999px;
+
+      /* Typography */
+      --font-family: 'Century Gothic', CenturyGothic, AppleGothic, 'Roboto', sans-serif;
+      --font-family-question: 'Roboto', sans-serif;     /* used for ? & numerical chips */
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-md: 1.125rem;
+      --font-size-lg: 1.4rem;
+      --font-size-xl: 1.95rem;
+      --font-size-2xl: 2.5rem;
+      --line-height-tight: 1.25;
+      --line-height-normal: 1.65;
+
+      /* Transitions */
+      --t-fast: 0.15s ease;
+      --t-base: 0.25s ease;
+      --t-slow: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      --t-spring: 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* =========================================================
+       2. BASE RESET
+       ========================================================= */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: var(--font-family);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      line-height: var(--line-height-normal);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, select, textarea { font-family: inherit; }
+
+    /* Roboto for question marks specifically (Zhi Kai's preference) */
+    .qmark {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       3. HEADER
+       ========================================================= */
+    .polymath-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+    }
+    .polymath-logo {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+    .print-btn {
+      position: absolute;
+      right: var(--space-lg);
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 8px 14px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xs);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      transition: all var(--t-base);
+    }
+    .print-btn:hover {
+      transform: translateY(-50%) translateY(-1px);
+      box-shadow: var(--shadow-button-hover);
+      border-color: var(--accent-base);
+      color: var(--accent-deep);
+    }
+    .print-btn svg { width: 16px; height: 16px; }
+
+    /* =========================================================
+       4. MAIN LAYOUT
+       ========================================================= */
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    .page-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-align: center;
+      margin-bottom: var(--space-xs);
+    }
+    .page-subtitle {
+      font-size: var(--font-size-md);
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
+    .page-subtitle strong {
+      color: var(--accent-deep);
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       5. INTRO PRIMER
+       ========================================================= */
+    .primer {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      max-width: 860px;
+      margin: 0 auto var(--space-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .primer h3 {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: var(--space-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .primer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-top: var(--space-md);
+    }
+    @media (max-width: 700px) {
+      .primer-grid { grid-template-columns: 1fr; }
+    }
+    .primer-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border-left: 3px solid var(--accent-base);
+    }
+    .primer-card h4 {
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .primer-card p {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================
+       6. QUESTION NAVIGATION (chips)
+       ========================================================= */
+    .nav-wrapper {
+      max-width: 1100px;
+      margin: 0 auto var(--space-xl);
+    }
+    .nav-label {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      margin-bottom: var(--space-md);
+    }
+    .question-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-sm);
+    }
+    .nav-chip {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 10px 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xs);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all var(--t-base);
+      min-width: 78px;
+    }
+    .nav-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-button-hover);
+      border-color: var(--accent-base);
+      color: var(--accent-deep);
+    }
+    .nav-chip.active {
+      background: var(--accent-deep);
+      border-color: var(--accent-deep);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    .nav-chip .chip-num {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      line-height: 1;
+    }
+    .nav-chip .chip-tag {
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .nav-chip.active .chip-tag { opacity: 1; }
+    .nav-chip[data-type="elim"] { border-left: 3px solid var(--hl-1-border); }
+    .nav-chip[data-type="sub"]  { border-left: 3px solid var(--hl-2-border); }
+    .nav-chip[data-type="mix"]  { border-left: 3px solid var(--hl-3-border); }
+
+    /* =========================================================
+       7. QUESTION CARD
+       ========================================================= */
+    .question-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: var(--space-xl);
+      max-width: 1080px;
+      margin: 0 auto;
+      animation: fadeInUp 0.45s var(--t-slow) both;
+    }
+    @media (max-width: 700px) {
+      .question-card { padding: var(--space-lg) var(--space-md); }
+    }
+
+    .qc-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      flex-wrap: wrap;
+    }
+    .qc-title-block { flex: 1 1 280px; }
+    .qc-meta {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .qc-q-number {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-light);
+      border-radius: var(--radius-full);
+      color: var(--accent-deep);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .qc-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .qc-tag.elim {
+      background: var(--hl-1-bg);
+      color: var(--hl-1-deep);
+      border: 1px solid var(--hl-1-border);
+    }
+    .qc-tag.sub {
+      background: var(--hl-2-bg);
+      color: var(--hl-2-deep);
+      border: 1px solid var(--hl-2-border);
+    }
+    .qc-tag.mix {
+      background: var(--hl-3-bg);
+      color: var(--hl-3-deep);
+      border: 1px solid var(--hl-3-border);
+    }
+    .qc-tag.diff {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-medium);
+    }
+    .qc-title {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    /* =========================================================
+       8. QUESTION PROSE WITH HIGHLIGHTS
+       ========================================================= */
+    .question-prose {
+      font-size: var(--font-size-md);
+      line-height: 1.85;
+      color: var(--text-primary);
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .question-prose .fact {
+      padding: 2px 6px;
+      border-radius: 5px;
+      transition: all var(--t-base);
+      border-bottom: 2px solid transparent;
+      cursor: default;
+    }
+    .question-prose .fact.f1 { background: transparent; }
+    .question-prose .fact.f2 { background: transparent; }
+    .question-prose .fact.f3 { background: transparent; }
+    .question-prose .fact.ask { background: transparent; }
+
+    /* When highlighted (active step), the spans glow */
+    .question-prose .fact.f1.is-active {
+      background: var(--hl-1-bg);
+      border-bottom-color: var(--hl-1-border);
+      box-shadow: 0 0 0 2px rgba(244, 201, 90, 0.25);
+      animation: highlightPop 0.4s var(--t-spring);
+    }
+    .question-prose .fact.f2.is-active {
+      background: var(--hl-2-bg);
+      border-bottom-color: var(--hl-2-border);
+      box-shadow: 0 0 0 2px rgba(111, 177, 240, 0.25);
+      animation: highlightPop 0.4s var(--t-spring);
+    }
+    .question-prose .fact.f3.is-active {
+      background: var(--hl-3-bg);
+      border-bottom-color: var(--hl-3-border);
+      box-shadow: 0 0 0 2px rgba(244, 143, 177, 0.25);
+      animation: highlightPop 0.4s var(--t-spring);
+    }
+    .question-prose .fact.ask.is-active {
+      background: var(--hl-ask-bg);
+      border-bottom-color: var(--hl-ask-border);
+      box-shadow: 0 0 0 2px rgba(102, 187, 106, 0.25);
+      font-weight: 700;
+      animation: highlightPop 0.4s var(--t-spring);
+    }
+    @keyframes highlightPop {
+      0%   { transform: scale(1);    }
+      40%  { transform: scale(1.04); }
+      100% { transform: scale(1);    }
+    }
+
+    /* =========================================================
+       9. STEPS PANEL
+       ========================================================= */
+    .steps-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+    .step-progress {
+      display: flex;
+      gap: 6px;
+      margin-bottom: var(--space-md);
+      flex-wrap: wrap;
+    }
+    .step-pip {
+      flex: 1 1 18px;
+      max-width: 56px;
+      height: 5px;
+      background: var(--border-subtle);
+      border-radius: var(--radius-full);
+      transition: background var(--t-base);
+    }
+    .step-pip.done { background: var(--accent-base); }
+    .step-pip.current {
+      background: var(--accent-deep);
+      box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.20);
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      flex-wrap: wrap;
+    }
+    .step-title {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      color: var(--accent-deep);
+    }
+    .step-counter {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .step-body {
+      animation: fadeInUp 0.4s var(--t-slow) both;
+    }
+    .step-explanation {
+      font-size: var(--font-size-base);
+      line-height: 1.7;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+    .step-explanation strong {
+      color: var(--accent-deep);
+    }
+
+    /* Buttons row */
+    .step-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      transition: all var(--t-base);
+      box-shadow: var(--shadow-button);
+    }
+    .btn-primary {
+      background: var(--accent-deep);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-button-hover);
+      background: #2E7D32;
+    }
+    .btn-primary:active {
+      transform: translateY(0.5px);
+      box-shadow: var(--shadow-button);
+    }
+    .btn-primary:disabled {
+      background: var(--border-medium);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-ghost {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-medium);
+    }
+    .btn-ghost:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-base);
+      color: var(--accent-deep);
+      box-shadow: var(--shadow-button-hover);
+    }
+    .btn-ghost:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn:focus-visible {
+      outline: 3px solid rgba(129, 199, 132, 0.55);
+      outline-offset: 2px;
+    }
+
+    /* =========================================================
+       10. EQUATION VISUALS — bar models & symbolic equations
+       ========================================================= */
+    .work-area {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-md) 0;
+    }
+    .work-area + .work-area { margin-top: var(--space-sm); }
+
+    .work-label {
+      font-size: var(--font-size-xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    /* Bar-model strip */
+    .bar-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      padding: var(--space-sm) 0;
+    }
+    .bar-block {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      min-width: 64px;
+      text-align: center;
+      animation: blockSlideIn 0.35s var(--t-spring) both;
+    }
+    .bar-block.item-a {
+      background: var(--item-a-bg);
+      border: 1px solid var(--item-a-border);
+      color: var(--item-a-text);
+    }
+    .bar-block.item-b {
+      background: var(--item-b-bg);
+      border: 1px solid var(--item-b-border);
+      color: var(--item-b-text);
+    }
+    .bar-block.item-c {
+      background: var(--hl-3-bg);
+      border: 1px solid var(--hl-3-border);
+      color: var(--hl-3-deep);
+    }
+    .bar-block.item-num {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-medium);
+      color: var(--text-primary);
+      font-family: var(--font-family-question);
+    }
+    .bar-equals {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin: 0 6px;
+    }
+    .bar-value {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      background: var(--item-value-bg);
+      border: 1px solid var(--item-value-border);
+      color: var(--item-value-text);
+      border-radius: 6px;
+      font-weight: 700;
+      font-family: var(--font-family-question);
+      animation: blockSlideIn 0.35s var(--t-spring) both;
+      animation-delay: 0.15s;
+    }
+    @keyframes blockSlideIn {
+      0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
+      100% { opacity: 1; transform: translateY(0)   scale(1);   }
+    }
+
+    /* Compact symbolic equation */
+    .eq-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      font-family: var(--font-family-question);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      animation: fadeInUp 0.35s var(--t-slow) both;
+    }
+    .eq-row + .eq-row { margin-top: 10px; }
+    .eq-label {
+      font-family: var(--font-family);
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 8px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      margin-right: 6px;
+      border: 1px solid var(--border-subtle);
+    }
+    .eq-token { padding: 2px 4px; }
+    .eq-token.var-a { color: var(--item-a-text); font-weight: 800; }
+    .eq-token.var-b { color: var(--item-b-text); font-weight: 800; }
+    .eq-token.var-c { color: var(--hl-3-deep);   font-weight: 800; }
+    .eq-token.num   { color: var(--text-primary); }
+    .eq-token.value { color: var(--accent-deep); font-weight: 800; }
+    .eq-token.op    { color: var(--text-secondary); }
+
+    .eq-row.is-target {
+      background: var(--accent-bg);
+      border-color: var(--accent-base);
+      box-shadow: var(--shadow-glow);
+    }
+    .eq-row.is-derived {
+      background: var(--hl-1-bg);
+      border-color: var(--hl-1-border);
+    }
+
+    /* Math operation badge attached to an equation row */
+    .eq-op-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      font-family: var(--font-family-question);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: var(--hl-1-bg);
+      border: 1px solid var(--hl-1-border);
+      color: var(--hl-1-deep);
+      border-radius: var(--radius-full);
+      margin-left: 8px;
+      animation: badgePop 0.35s var(--t-spring) both;
+      animation-delay: 0.1s;
+    }
+    @keyframes badgePop {
+      0%   { opacity: 0; transform: scale(0.7); }
+      60%  { opacity: 1; transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    /* Subtraction / addition bracket notation */
+    .eq-pair {
+      position: relative;
+      padding-right: 56px;
+      margin: var(--space-md) 0;
+    }
+    .eq-pair-bracket {
+      position: absolute;
+      right: 8px;
+      top: 0;
+      bottom: 0;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .eq-pair-bracket::before {
+      content: "";
+      position: absolute;
+      right: 18px;
+      top: 14px;
+      bottom: 14px;
+      width: 14px;
+      border: 2px solid var(--accent-base);
+      border-left: none;
+      border-radius: 0 12px 12px 0;
+    }
+    .eq-pair-bracket span {
+      position: absolute;
+      right: -2px;
+      background: var(--bg-primary);
+      padding: 4px 6px;
+      font-family: var(--font-family-question);
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-deep);
+    }
+
+    /* Result line — clearly distinguished */
+    .eq-row.is-result {
+      background: var(--accent-bg);
+      border: 2px solid var(--accent-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Substitution arrow chain */
+    .swap-chain {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .swap-arrow {
+      font-size: 1.6rem;
+      color: var(--accent-deep);
+      animation: arrowBounce 1.4s ease-in-out infinite;
+    }
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(4px); }
+    }
+
+    /* =========================================================
+       11. ANSWER REVEAL CARD
+       ========================================================= */
+    .answer-card {
+      margin-top: var(--space-lg);
+      padding: var(--space-lg) var(--space-xl);
+      background: linear-gradient(135deg, #F1F8E9, #E8F5E9);
+      border: 2px solid var(--accent-base);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md), 0 0 0 6px rgba(129, 199, 132, 0.10);
+      text-align: center;
+      animation: answerReveal 0.65s var(--t-spring) both;
+      position: relative;
+      overflow: hidden;
+    }
+    .answer-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.55), transparent 60%);
+      pointer-events: none;
+    }
+    @keyframes answerReveal {
+      0%   { opacity: 0; transform: translateY(12px) scale(0.96); }
+      60%  { opacity: 1; transform: translateY(-2px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .answer-card .ans-label {
+      font-size: var(--font-size-sm);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: var(--space-sm);
+    }
+    .answer-card .ans-value {
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      font-family: var(--font-family-question);
+    }
+    .answer-card .ans-secondary {
+      margin-top: var(--space-sm);
+      font-size: var(--font-size-md);
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================
+       12. STRATEGY BANNER (Elimination vs Substitution)
+       ========================================================= */
+    .strategy-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xs);
+      border-left: 4px solid var(--accent-base);
+      margin-bottom: var(--space-md);
+    }
+    .strategy-banner.elim { border-left-color: var(--hl-1-border); }
+    .strategy-banner.sub  { border-left-color: var(--hl-2-border); }
+    .strategy-icon {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-full);
+      font-size: 22px;
+    }
+    .strategy-content { flex: 1; }
+    .strategy-content h4 {
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .strategy-content p {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================
+       13. KEY INSIGHT TAKEAWAY
+       ========================================================= */
+    .takeaway {
+      margin-top: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+    .takeaway-icon {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--accent-bg);
+      color: var(--accent-deep);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: var(--font-family-question);
+    }
+    .takeaway p {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .takeaway p strong { color: var(--text-primary); }
+
+    /* =========================================================
+       14. UNITS & PARTS LEDGER
+       ========================================================= */
+    .ledger-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin: var(--space-md) 0;
+    }
+    @media (max-width: 600px) {
+      .ledger-grid { grid-template-columns: 1fr; }
+    }
+    .ledger-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      animation: fadeInUp 0.35s var(--t-slow) both;
+    }
+    .ledger-card.var-a { border-top: 3px solid var(--item-a-border); }
+    .ledger-card.var-b { border-top: 3px solid var(--item-b-border); }
+    .ledger-card h5 {
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      letter-spacing: 0.02em;
+    }
+    .ledger-card.var-a h5 { color: var(--item-a-text); }
+    .ledger-card.var-b h5 { color: var(--item-b-text); }
+    .ledger-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-family: var(--font-family-question);
+      font-size: 0.95rem;
+      border-bottom: 1px dashed var(--border-subtle);
+    }
+    .ledger-row:last-child { border-bottom: none; }
+    .ledger-row .label {
+      color: var(--text-secondary);
+      font-family: var(--font-family);
+      font-size: var(--font-size-sm);
+    }
+    .ledger-row .val {
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       15. ANIMATIONS — generic
+       ========================================================= */
+    @keyframes fadeInUp {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      0%   { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* =========================================================
+       16. PRINT STYLES
+       ========================================================= */
+    @page { size: A4; margin: 15mm 16mm; }
+    @media print {
+      :root {
+        --shadow-sm: none;
+        --shadow-md: none;
+        --shadow-lg: none;
+      }
+      body { background: white; }
+      .print-btn,
+      .nav-wrapper,
+      .step-controls,
+      .step-progress { display: none !important; }
+      .question-card,
+      .primer,
+      .work-area,
+      .answer-card,
+      .takeaway,
+      .strategy-banner,
+      .steps-panel {
+        box-shadow: none !important;
+        background: white !important;
+        page-break-inside: avoid;
+      }
+      .question-card { padding: 12px 0 !important; border: none !important; }
+      .step-body { display: block !important; }
+      .step-body[data-current="false"] { display: block !important; }
+      .all-steps-print { display: block !important; }
+      .polymath-logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .nav-chip,
+      .qc-tag,
+      .qc-q-number,
+      .bar-block,
+      .bar-value,
+      .eq-row,
+      .ledger-card {
+        box-shadow: none !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .question-prose .fact { background: transparent !important; box-shadow: none !important; }
+      .question-prose .fact.is-active {
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: var(--accent-base);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="polymath-header">
+    <img
+      src="https://dl.dropboxusercontent.com/scl/fi/h40yjlyg8ldefwfaa3dib/polymath-logo-sticker.png?rlkey=o1ra4taqy79gt9t8u096v82zj"
+      alt="Polymath Learning Centre"
+      class="polymath-logo"
+    />
+    <button class="print-btn" type="button" onclick="window.print()" aria-label="Print this page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      <span>Print</span>
+    </button>
+  </header>
+
+  <main>
+    <h1 class="page-title">Simultaneous Concept Explorer</h1>
+    <p class="page-subtitle">
+      <strong>Primary 6 Math</strong> &nbsp;|&nbsp; Solve word problems by forming &amp; manipulating two equations
+    </p>
+
+    <!-- ========== PRIMER ========== -->
+    <section class="primer">
+      <h3>How do I spot a Simultaneous Concept question<span class="qmark">?</span></h3>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+        You are given the values of <strong>2 sets of things</strong> from which you can form
+        <strong>2 equations</strong>. Once you have them, your job is to remove or replace one unknown so
+        only one is left to solve. There are two main strategies:
+      </p>
+      <div class="primer-grid">
+        <div class="primer-card">
+          <h4>🟡 Elimination</h4>
+          <p>
+            Match the coefficients of one variable in both equations (using ×, ÷, or simplification),
+            then <strong>subtract</strong> one equation from the other to make that variable disappear.
+          </p>
+        </div>
+        <div class="primer-card">
+          <h4>🔵 Substitution</h4>
+          <p>
+            Build an <strong>exchange rate</strong> between the two unknowns and use it to swap one
+            unknown for the other. Solve in terms of just one variable.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== QUESTION NAV ========== -->
+    <div class="nav-wrapper">
+      <p class="nav-label">Choose a question</p>
+      <div class="question-nav" id="questionNav"></div>
+    </div>
+
+    <!-- ========== ACTIVE QUESTION ========== -->
+    <div id="questionDisplay"></div>
+  </main>
+
+  <script>
+    /* =========================================================
+       Render helpers — symbolic equations, bar models, ledgers
+       ========================================================= */
+
+    /**
+     * Render a symbolic equation row.
+     *  tokens: array of { type: 'var-a'|'var-b'|'var-c'|'num'|'value'|'op'|'eq', text }
+     *  options: { label?, badge?, classNames? }
+     */
+    function eqRow(tokens, options = {}) {
+      const cls = ['eq-row'];
+      if (options.classNames) cls.push(options.classNames);
+      const labelHtml = options.label
+        ? `<span class="eq-label">${options.label}</span>`
+        : '';
+      const badgeHtml = options.badge
+        ? `<span class="eq-op-badge">${options.badge}</span>`
+        : '';
+      const tokensHtml = tokens.map(tk => {
+        if (tk.type === 'eq') return `<span class="eq-token op">=</span>`;
+        if (tk.type === 'plus') return `<span class="eq-token op">+</span>`;
+        if (tk.type === 'minus') return `<span class="eq-token op">−</span>`;
+        if (tk.type === 'arrow') return `<span class="eq-token op">→</span>`;
+        return `<span class="eq-token ${tk.type}">${tk.text}</span>`;
+      }).join('');
+      return `<div class="${cls.join(' ')}">${labelHtml}${tokensHtml}${badgeHtml}</div>`;
+    }
+
+    /**
+     * Render a bar-model strip with named blocks.
+     *  parts: array of { kind: 'a'|'b'|'c'|'num', text, count? }
+     *  total: optional value string to show after equals
+     */
+    function barStrip(parts, total) {
+      const blocks = [];
+      parts.forEach(p => {
+        const n = p.count ?? 1;
+        for (let i = 0; i < n; i++) {
+          const cls = p.kind === 'a' ? 'item-a'
+                    : p.kind === 'b' ? 'item-b'
+                    : p.kind === 'c' ? 'item-c'
+                    : 'item-num';
+          blocks.push(`<span class="bar-block ${cls}">${p.text}</span>`);
+        }
+      });
+      const totalHtml = total
+        ? `<span class="bar-equals">=</span><span class="bar-value">${total}</span>`
+        : '';
+      return `<div class="bar-strip">${blocks.join('')}${totalHtml}</div>`;
+    }
+
+    /** Wraps a section in a labeled work area card. */
+    function workArea(label, innerHTML) {
+      return `<div class="work-area">
+        ${label ? `<div class="work-label">${label}</div>` : ''}
+        ${innerHTML}
+      </div>`;
+    }
+
+    /** A subtle "→ leads to" arrow between bars / equations. */
+    function chainArrow() {
+      return `<div class="swap-chain"><span class="swap-arrow">⇩</span></div>`;
+    }
+
+    /** Strategy banner */
+    function strategyBanner(strategy, text) {
+      const map = {
+        elim: { icon: '🟡', title: 'Strategy: Elimination', cls: 'elim' },
+        sub:  { icon: '🔵', title: 'Strategy: Substitution', cls: 'sub' },
+        mix:  { icon: '🟢', title: 'Strategy: Units &amp; Parts + Simultaneous', cls: '' },
+      };
+      const m = map[strategy] || map.mix;
+      return `
+        <div class="strategy-banner ${m.cls}">
+          <div class="strategy-icon">${m.icon}</div>
+          <div class="strategy-content">
+            <h4>${m.title}</h4>
+            <p>${text}</p>
+          </div>
+        </div>`;
+    }
+
+    /** Two-column "before / after" ledger for units & parts. */
+    function ledger(itemA, itemB) {
+      const renderRows = rows => rows.map(r =>
+        `<div class="ledger-row"><span class="label">${r.label}</span><span class="val">${r.val}</span></div>`
+      ).join('');
+      return `<div class="ledger-grid">
+        <div class="ledger-card var-a">
+          <h5>${itemA.title}</h5>
+          ${renderRows(itemA.rows)}
+        </div>
+        <div class="ledger-card var-b">
+          <h5>${itemB.title}</h5>
+          ${renderRows(itemB.rows)}
+        </div>
+      </div>`;
+    }
+
+    /** Final answer card. Optional secondary line for two-part questions. */
+    function answerCard(label, value, secondary) {
+      return `<div class="answer-card">
+        <div class="ans-label">${label}</div>
+        <div class="ans-value">${value}</div>
+        ${secondary ? `<div class="ans-secondary">${secondary}</div>` : ''}
+      </div>`;
+    }
+
+    /** Small takeaway / hint box at the end of a step. */
+    function takeaway(html) {
+      return `<div class="takeaway">
+        <span class="takeaway-icon">💡</span>
+        <p>${html}</p>
+      </div>`;
+    }
+
+
+    /* =========================================================
+       QUESTION DATA  —  12 questions
+       ========================================================= */
+    const QUESTIONS = [
+
+      /* ---------- Q1: Elimination, basic ---------- */
+      {
+        id: 1,
+        title: 'Markers and Notebooks',
+        type: 'elim',
+        tagText: 'Elimination',
+        difficulty: 'Basic',
+        questionParts: [
+          { text: 'Aiden bought ' },
+          { text: '4 markers and 2 notebooks for $13.60', fact: 'f1' },
+          { text: '. Bryan bought ' },
+          { text: '8 markers and 8 notebooks for $32.00', fact: 'f2' },
+          { text: '. Find the ' },
+          { text: 'cost of 1 notebook', fact: 'ask' },
+          { text: '.' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Translate the first sentence into an equation',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Aiden bought <strong>4 markers</strong> and <strong>2 notebooks</strong> for a total of <strong>$13.60</strong>.
+                Let's use <strong>M</strong> for the price of one marker and <strong>N</strong> for the price of one notebook.
+              </p>` +
+              workArea('Bar model — Aiden\'s purchase',
+                barStrip([
+                  { kind: 'a', text: 'marker', count: 4 },
+                  { kind: 'b', text: 'notebook', count: 2 }
+                ], '$13.60')
+              ) +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-a', text: '4M' },
+                  { type: 'plus' },
+                  { type: 'var-b', text: '2N' },
+                  { type: 'eq' },
+                  { type: 'value', text: '$13.60' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 2 — Translate the second sentence into an equation',
+            highlights: ['f1', 'f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Bryan's purchase gives us a second equation. Same letters M and N — we now have <strong>two equations
+                with two unknowns</strong>, which is the hallmark of a simultaneous concept question.
+              </p>` +
+              workArea('Bar model — Bryan\'s purchase',
+                barStrip([
+                  { kind: 'a', text: 'marker', count: 8 },
+                  { kind: 'b', text: 'notebook', count: 8 }
+                ], '$32.00')
+              ) +
+              workArea('Both equations side by side',
+                eqRow([
+                  { type: 'var-a', text: '4M' }, { type: 'plus' },
+                  { type: 'var-b', text: '2N' }, { type: 'eq' },
+                  { type: 'value', text: '$13.60' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'var-a', text: '8M' }, { type: 'plus' },
+                  { type: 'var-b', text: '8N' }, { type: 'eq' },
+                  { type: 'value', text: '$32.00' }
+                ], { label: '(2)' })
+              )
+          },
+          {
+            title: 'Step 3 — Choose a strategy',
+            highlights: ['f1', 'f2', 'ask'],
+            content: () =>
+              strategyBanner('elim',
+                'We want to find the price of <strong>1 notebook (N)</strong>. So our goal is to eliminate <strong>M</strong> from the equations. We will scale the equations until both have matching M coefficients, then subtract.'
+              ) +
+              `<p class="step-explanation">
+                Notice that equation (2) has every coefficient as a <strong>multiple of 4</strong>. That makes it our easiest target — let's simplify it first.
+              </p>`
+          },
+          {
+            title: 'Step 4 — Simplify equation (2) by ÷4',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Divide every term of equation (2) by <strong>4</strong>. Doing the same operation to every part of an equation
+                keeps it true. The simpler version we get will be much easier to combine with equation (1).
+              </p>` +
+              workArea('Equation (2): divide every term by 4',
+                eqRow([
+                  { type: 'var-a', text: '8M' }, { type: 'plus' },
+                  { type: 'var-b', text: '8N' }, { type: 'eq' },
+                  { type: 'value', text: '$32.00' }
+                ], { label: '(2)', badge: '÷ 4' }) +
+                eqRow([
+                  { type: 'var-a', text: '2M' }, { type: 'plus' },
+                  { type: 'var-b', text: '2N' }, { type: 'eq' },
+                  { type: 'value', text: '$8.00' }
+                ], { label: '(2′)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 5 — Align the M coefficients',
+            highlights: ['f1', 'f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Equation (1) has <strong>4M</strong>; the simplified equation has <strong>2M</strong>. To match them, multiply
+                equation (2′) by <strong>2</strong>. Now both equations have the same <strong>4M</strong> term — perfect for elimination.
+              </p>` +
+              workArea('Multiply equation (2′) by 2',
+                eqRow([
+                  { type: 'var-a', text: '2M' }, { type: 'plus' },
+                  { type: 'var-b', text: '2N' }, { type: 'eq' },
+                  { type: 'value', text: '$8.00' }
+                ], { label: '(2′)', badge: '× 2' }) +
+                eqRow([
+                  { type: 'var-a', text: '4M' }, { type: 'plus' },
+                  { type: 'var-b', text: '4N' }, { type: 'eq' },
+                  { type: 'value', text: '$16.00' }
+                ], { label: '(2″)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 6 — Subtract to eliminate M',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Subtract equation (1) from equation (2″). The 4M cancels and we are left with an equation in <strong>N alone</strong>.
+              </p>` +
+              workArea('Eliminate M',
+                eqRow([
+                  { type: 'var-a', text: '4M' }, { type: 'plus' },
+                  { type: 'var-b', text: '4N' }, { type: 'eq' },
+                  { type: 'value', text: '$16.00' }
+                ], { label: '(2″)' }) +
+                eqRow([
+                  { type: 'var-a', text: '4M' }, { type: 'plus' },
+                  { type: 'var-b', text: '2N' }, { type: 'eq' },
+                  { type: 'value', text: '$13.60' }
+                ], { label: '(1)', badge: 'subtract' }) +
+                eqRow([
+                  { type: 'var-b', text: '2N' }, { type: 'eq' },
+                  { type: 'value', text: '$2.40' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Solve for one notebook',
+                eqRow([
+                  { type: 'value', text: '1N' }, { type: 'eq' },
+                  { type: 'num', text: '$2.40' }, { type: 'op', text: '÷' },
+                  { type: 'num', text: '2' }, { type: 'eq' },
+                  { type: 'value', text: '$1.20' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Cost of 1 notebook', '$1.20') +
+              takeaway(
+                '<strong>Why elimination?</strong> Because we wanted N (notebook) directly. We targeted the <em>other</em> ' +
+                'unknown M to remove. Always remove the variable you are <em>not</em> being asked about.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q2: Substitution, basic ---------- */
+      {
+        id: 2,
+        title: 'Truck of Fridges &amp; Microwaves',
+        type: 'sub',
+        tagText: 'Substitution',
+        difficulty: 'Basic',
+        questionParts: [
+          { text: 'A delivery truck has enough space to either fit ' },
+          { text: '18 fridges or 27 microwaves', fact: 'f1' },
+          { text: '. If the truck is loaded with ' },
+          { text: '6 fridges', fact: 'f2' },
+          { text: ', ' },
+          { text: 'how many microwaves can fit into the remaining space', fact: 'ask' },
+          { text: '?' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Build the exchange rate',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                The truck holds <strong>18 fridges</strong> OR <strong>27 microwaves</strong>. They take up the
+                <em>same total space</em>. So we can write an equality between the two:
+              </p>` +
+              workArea('Same space, two ways to fill it',
+                barStrip([{ kind: 'a', text: 'F', count: 18 }]) +
+                chainArrow() +
+                barStrip([{ kind: 'b', text: 'M', count: 27 }])
+              ) +
+              workArea('Exchange equation',
+                eqRow([
+                  { type: 'var-a', text: '18 F' },
+                  { type: 'eq' },
+                  { type: 'var-b', text: '27 M' }
+                ], { label: 'Exchange', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 2 — Simplify the exchange rate',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Both sides share a common factor of <strong>9</strong>. Simplifying the exchange rate gives us a much friendlier
+                "swap" we can use throughout the question.
+              </p>` +
+              workArea('Divide both sides by 9',
+                eqRow([
+                  { type: 'var-a', text: '18 F' }, { type: 'eq' },
+                  { type: 'var-b', text: '27 M' }
+                ], { badge: '÷ 9' }) +
+                eqRow([
+                  { type: 'var-a', text: '2 F' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 M' }
+                ], { classNames: 'is-result' })
+              ) +
+              takeaway(
+                'This is the <strong>golden swap</strong>: every <strong>2 fridges</strong> can be replaced by ' +
+                '<strong>3 microwaves</strong> (and vice versa).'
+              )
+          },
+          {
+            title: 'Step 3 — Find the leftover space (in fridges)',
+            highlights: ['f1', 'f2'],
+            content: () =>
+              `<p class="step-explanation">
+                The truck holds 18 fridges in total. <strong>6 fridges</strong> are already loaded, so the remaining space
+                is enough for <strong>18 − 6 = 12 fridges</strong>.
+              </p>` +
+              workArea('Remaining capacity in fridge units',
+                eqRow([
+                  { type: 'num', text: '18 F' }, { type: 'minus' },
+                  { type: 'num', text: '6 F' }, { type: 'eq' },
+                  { type: 'value', text: '12 F' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 4 — Convert remaining fridge space to microwaves',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Use the swap from Step 2: every <strong>2 F = 3 M</strong>. So 12 fridge-units of space contains
+                <strong>12 ÷ 2 = 6</strong> "swap groups", and each group is worth 3 microwaves.
+              </p>` +
+              workArea('Apply the exchange',
+                eqRow([
+                  { type: 'num', text: '12 F' }, { type: 'op', text: '÷' },
+                  { type: 'num', text: '2 F' }, { type: 'eq' },
+                  { type: 'value', text: '6 swap-groups' }
+                ]) +
+                eqRow([
+                  { type: 'num', text: '6' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '3 M' }, { type: 'eq' },
+                  { type: 'value', text: '18 M' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Microwaves that fit in the remaining space', '18 microwaves') +
+              takeaway(
+                '<strong>When to substitute?</strong> When the question gives you the value of <em>one bundle in terms of another</em> ' +
+                '(e.g. "either fit X or Y"), you can build an exchange rate and swap directly. No subtraction of equations needed.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q3: Cupcakes & Pies — units & parts simultaneous ---------- */
+      {
+        id: 3,
+        title: 'Mrs Lim\'s Bakery — Cupcakes &amp; Pies',
+        type: 'mix',
+        tagText: 'Units &amp; Parts',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'Mrs Lim had ' },
+          { text: '150 cupcakes and pies altogether', fact: 'f1' },
+          { text: '. After she sold ' },
+          { text: '½ of the cupcakes and ⅗ of the pies', fact: 'f2' },
+          { text: ', she had ' },
+          { text: '15 more pies than cupcakes left', fact: 'f3' },
+          { text: '. ' },
+          { text: 'How many cupcakes and pies had she left in all', fact: 'ask' },
+          { text: '?' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Set up units for each item',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                The fractions tell us the natural unit sizes. Cupcakes were sold in halves, so use <strong>2 units</strong> for cupcakes.
+                Pies were sold in fifths, so use <strong>5 units</strong> for pies. After selling, ½ of cupcakes are left
+                (1 unit) and ⅖ of pies are left (2 units).
+              </p>` +
+              ledger(
+                {
+                  title: 'Cupcakes (C)',
+                  rows: [
+                    { label: 'At first', val: '2C' },
+                    { label: 'Sold (½)',  val: '1C' },
+                    { label: 'Left (½)',  val: '1C' }
+                  ]
+                },
+                {
+                  title: 'Pies (P)',
+                  rows: [
+                    { label: 'At first', val: '5P' },
+                    { label: 'Sold (⅗)',  val: '3P' },
+                    { label: 'Left (⅖)',  val: '2P' }
+                  ]
+                }
+              )
+          },
+          {
+            title: 'Step 2 — Form the first equation (total at start)',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Total cupcakes + total pies <strong>at first</strong> = 150.
+              </p>` +
+              workArea('Equation (1) — total at start',
+                eqRow([
+                  { type: 'var-a', text: '2C' }, { type: 'plus' },
+                  { type: 'var-b', text: '5P' }, { type: 'eq' },
+                  { type: 'value', text: '150' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 3 — Form the second equation (left over)',
+            highlights: ['f3'],
+            content: () =>
+              `<p class="step-explanation">
+                "15 more pies than cupcakes left" → <strong>(pies left) = (cupcakes left) + 15</strong>.
+                Plug in the units we set up.
+              </p>` +
+              workArea('Equation (2) — what was left',
+                eqRow([
+                  { type: 'var-a', text: '1C' }, { type: 'plus' },
+                  { type: 'num', text: '15' }, { type: 'eq' },
+                  { type: 'var-b', text: '2P' }
+                ], { label: '(2)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 4 — Choose strategy &amp; align variables',
+            highlights: ['f1', 'f3'],
+            content: () =>
+              strategyBanner('elim',
+                'We have two equations: 2C + 5P = 150 and 1C + 15 = 2P. We will <strong>eliminate C</strong> by scaling equation (2) by 2 so both have <strong>2C</strong>.'
+              ) +
+              workArea('Multiply equation (2) by 2',
+                eqRow([
+                  { type: 'var-a', text: '1C' }, { type: 'plus' },
+                  { type: 'num', text: '15' }, { type: 'eq' },
+                  { type: 'var-b', text: '2P' }
+                ], { label: '(2)', badge: '× 2' }) +
+                eqRow([
+                  { type: 'var-a', text: '2C' }, { type: 'plus' },
+                  { type: 'num', text: '30' }, { type: 'eq' },
+                  { type: 'var-b', text: '4P' }
+                ], { label: '(2′)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 5 — Substitute &amp; solve for P',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                From (2′): <strong>2C = 4P − 30</strong>. Replace 2C in equation (1).
+              </p>` +
+              workArea('Substitute into equation (1)',
+                eqRow([
+                  { type: 'var-a', text: '2C' }, { type: 'plus' },
+                  { type: 'var-b', text: '5P' }, { type: 'eq' },
+                  { type: 'num', text: '150' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'op', text: '(' }, { type: 'var-b', text: '4P' },
+                  { type: 'minus' }, { type: 'num', text: '30' }, { type: 'op', text: ')' },
+                  { type: 'plus' }, { type: 'var-b', text: '5P' },
+                  { type: 'eq' }, { type: 'num', text: '150' }
+                ]) +
+                eqRow([
+                  { type: 'var-b', text: '9P' }, { type: 'eq' },
+                  { type: 'num', text: '180' }
+                ]) +
+                eqRow([
+                  { type: 'var-b', text: '1P' }, { type: 'eq' },
+                  { type: 'value', text: '20' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Find C and the total left',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                From equation (2): 1C + 15 = 2P = 40, so <strong>1C = 25</strong>. Now compute what was left.
+              </p>` +
+              workArea('Build the answer',
+                eqRow([
+                  { type: 'var-a', text: '1C (cupcakes left)' }, { type: 'eq' },
+                  { type: 'value', text: '25' }
+                ]) +
+                eqRow([
+                  { type: 'var-b', text: '2P (pies left)' }, { type: 'eq' },
+                  { type: 'value', text: '40' }
+                ]) +
+                eqRow([
+                  { type: 'num', text: 'Total left' }, { type: 'eq' },
+                  { type: 'num', text: '25' }, { type: 'plus' },
+                  { type: 'num', text: '40' }, { type: 'eq' },
+                  { type: 'value', text: '65' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Cupcakes &amp; pies left in all', '65') +
+              takeaway(
+                'Whenever fractions like <strong>½, ⅗</strong> appear, the denominator tells you the unit size. ' +
+                'Setting C = 2 units and P = 5 units made the leftover counts (1C and 2P) clean integers — no fractions needed!'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q4: Marcus's sit-ups — elimination, time/speed ---------- */
+      {
+        id: 4,
+        title: 'Marcus\'s Sit-up Challenge',
+        type: 'elim',
+        tagText: 'Elimination',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'To stay fit, Marcus does ' },
+          { text: '30 sit-ups every day', fact: 'f1' },
+          { text: '. If he does ' },
+          { text: '5 fast sit-ups and 25 slow sit-ups, he takes 99 seconds', fact: 'f2' },
+          { text: '. If he does ' },
+          { text: '15 fast and 15 slow, he takes 18 seconds less', fact: 'f3' },
+          { text: '. ' },
+          { text: 'How long will Marcus take to do 30 fast sit-ups', fact: 'ask' },
+          { text: '?' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Define your variables',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Let <strong>F</strong> = time (seconds) for one <em>fast</em> sit-up and
+                <strong>S</strong> = time (seconds) for one <em>slow</em> sit-up.
+              </p>` +
+              workArea('Variables',
+                eqRow([
+                  { type: 'var-a', text: 'F' }, { type: 'arrow' },
+                  { type: 'num', text: 'time for 1 fast sit-up' }
+                ]) +
+                eqRow([
+                  { type: 'var-b', text: 'S' }, { type: 'arrow' },
+                  { type: 'num', text: 'time for 1 slow sit-up' }
+                ])
+              )
+          },
+          {
+            title: 'Step 2 — Form equation (1)',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                5 fast + 25 slow = 99s.
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-a', text: '5F' }, { type: 'plus' },
+                  { type: 'var-b', text: '25S' }, { type: 'eq' },
+                  { type: 'value', text: '99' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 3 — Form equation (2)',
+            highlights: ['f3'],
+            content: () =>
+              `<p class="step-explanation">
+                "18 seconds less" than 99s means <strong>81s</strong>. So 15 fast + 15 slow = 81s.
+              </p>` +
+              workArea('Equation (2)',
+                eqRow([
+                  { type: 'num', text: '99' }, { type: 'minus' },
+                  { type: 'num', text: '18' }, { type: 'eq' },
+                  { type: 'value', text: '81' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: '15F' }, { type: 'plus' },
+                  { type: 'var-b', text: '15S' }, { type: 'eq' },
+                  { type: 'value', text: '81' }
+                ], { label: '(2)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 4 — Simplify equation (2)',
+            highlights: ['f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Equation (2) is divisible by <strong>3</strong>. Simplify it first.
+              </p>` +
+              workArea('Equation (2) ÷ 3',
+                eqRow([
+                  { type: 'var-a', text: '15F' }, { type: 'plus' },
+                  { type: 'var-b', text: '15S' }, { type: 'eq' },
+                  { type: 'value', text: '81' }
+                ], { label: '(2)', badge: '÷ 3' }) +
+                eqRow([
+                  { type: 'var-a', text: '5F' }, { type: 'plus' },
+                  { type: 'var-b', text: '5S' }, { type: 'eq' },
+                  { type: 'value', text: '27' }
+                ], { label: '(2′)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 5 — Subtract (1) from a scaled (2′) to eliminate F',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                We want time for 30 fast sit-ups, which means we want F. So we should remove S from the system.
+                Multiply (2′) by 5 so the S coefficient matches equation (1).
+              </p>` +
+              workArea('Multiply (2′) by 5',
+                eqRow([
+                  { type: 'var-a', text: '5F' }, { type: 'plus' },
+                  { type: 'var-b', text: '5S' }, { type: 'eq' },
+                  { type: 'value', text: '27' }
+                ], { label: '(2′)', badge: '× 5' }) +
+                eqRow([
+                  { type: 'var-a', text: '25F' }, { type: 'plus' },
+                  { type: 'var-b', text: '25S' }, { type: 'eq' },
+                  { type: 'value', text: '135' }
+                ], { label: '(2″)', classNames: 'is-derived' })
+              ) +
+              workArea('Subtract (1) from (2″)',
+                eqRow([
+                  { type: 'var-a', text: '25F' }, { type: 'plus' },
+                  { type: 'var-b', text: '25S' }, { type: 'eq' },
+                  { type: 'num', text: '135' }
+                ], { label: '(2″)' }) +
+                eqRow([
+                  { type: 'var-a', text: '5F' }, { type: 'plus' },
+                  { type: 'var-b', text: '25S' }, { type: 'eq' },
+                  { type: 'num', text: '99' }
+                ], { label: '(1)', badge: 'subtract' }) +
+                eqRow([
+                  { type: 'var-a', text: '20F' }, { type: 'eq' },
+                  { type: 'value', text: '36' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Solve for F and scale up',
+            highlights: ['ask'],
+            content: () =>
+              workArea('Find time for 1 fast sit-up',
+                eqRow([
+                  { type: 'var-a', text: '1F' }, { type: 'eq' },
+                  { type: 'num', text: '36' }, { type: 'op', text: '÷' },
+                  { type: 'num', text: '20' }, { type: 'eq' },
+                  { type: 'value', text: '1.8 s' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Time for 30 fast sit-ups',
+                eqRow([
+                  { type: 'num', text: '30' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '1.8 s' }, { type: 'eq' },
+                  { type: 'value', text: '54 s' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Time for 30 fast sit-ups', '54 seconds') +
+              takeaway(
+                'When you see "<strong>X seconds less</strong>" or "<strong>Y more</strong>", convert it to a clean equation first. ' +
+                'Then look for <em>common factors</em> to simplify before scaling.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q5: Mix (units & parts), percent-change ratios ---------- */
+      {
+        id: 5,
+        title: 'Mr Goh\'s Goldfish &amp; Koi Pond',
+        type: 'mix',
+        tagText: 'Units &amp; Parts',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'Mr Goh kept goldfish and koi in his pond. In March, ' },
+          { text: 'there were 480 more goldfish than koi', fact: 'f1' },
+          { text: '. In April, the number of goldfish ' },
+          { text: 'increased by 25%', fact: 'f2' },
+          { text: ', but the number of koi ' },
+          { text: 'decreased by 20%', fact: 'f3' },
+          { text: '. The total number of fish in April was ' },
+          { text: '1625', fact: 'f2' },
+          { text: '. ' },
+          { text: 'How many goldfish did Mr Goh have in March', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Convert each percentage change into a ratio',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                When you read "<strong>increased by 25%</strong>" or "<strong>decreased by 20%</strong>", do <em>not</em>
+                jump to algebra with decimals. Instead, convert each change into a clean
+                <strong>before : after</strong> ratio. Whole-number ratios are far easier to combine.
+              </p>` +
+              workArea('Goldfish: +25%',
+                `<p class="step-explanation">
+                  +25% means the new amount is <strong>125% = 5⁄4</strong> of the old amount.
+                  So the ratio of <strong>March : April</strong> for goldfish is <strong>4 : 5</strong>.
+                </p>` +
+                eqRow([
+                  { type: 'value', text: 'Goldfish March : April' }, { type: 'eq' },
+                  { type: 'var-a', text: '4' }, { type: 'op', text: ':' },
+                  { type: 'var-a', text: '5' }
+                ], { classNames: 'is-target' })
+              ) +
+              workArea('Koi: −20%',
+                `<p class="step-explanation">
+                  −20% means the new amount is <strong>80% = 4⁄5</strong> of the old amount.
+                  So the ratio of <strong>March : April</strong> for koi is <strong>5 : 4</strong>.
+                </p>` +
+                eqRow([
+                  { type: 'value', text: 'Koi March : April' }, { type: 'eq' },
+                  { type: 'var-b', text: '5' }, { type: 'op', text: ':' },
+                  { type: 'var-b', text: '4' }
+                ], { classNames: 'is-target' })
+              ) +
+              takeaway(
+                'Two <em>independent</em> ratios that don\'t share a common quantity. ' +
+                'We need <strong>different denominations</strong> — call goldfish "<strong>parts (p)</strong>" and koi "<strong>units (u)</strong>" so they don\'t get mixed up.'
+              )
+          },
+          {
+            title: 'Step 2 — Assign parts and units, then list every quantity',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Use <strong>parts (p)</strong> for goldfish and <strong>units (u)</strong> for koi. Now every March/April
+                quantity is expressed cleanly:
+              </p>` +
+              ledger(
+                {
+                  title: 'Goldfish (parts)',
+                  rows: [
+                    { label: 'March', val: '4p' },
+                    { label: 'April', val: '5p' }
+                  ]
+                },
+                {
+                  title: 'Koi (units)',
+                  rows: [
+                    { label: 'March', val: '5u' },
+                    { label: 'April', val: '4u' }
+                  ]
+                }
+              ) +
+              takeaway(
+                'Notice how using two letters keeps the goldfish ratio and koi ratio <strong>separate</strong>. ' +
+                'If we used "u" for both, the working would collapse into nonsense.'
+              )
+          },
+          {
+            title: 'Step 3 — Form Equation (1) from the March difference',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                "There were <strong>480 more goldfish than koi</strong>" describes <em>March</em>. Use the March quantities:
+                goldfish = <strong>4p</strong>, koi = <strong>5u</strong>.
+              </p>` +
+              workArea('Equation (1) — March',
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'minus' },
+                  { type: 'var-b', text: '5u' }, { type: 'eq' },
+                  { type: 'value', text: '480' }
+                ], { label: '(1)', classNames: 'is-target' })
+              ) +
+              takeaway(
+                'Be careful: "<strong>more than</strong>" means <em>subtract</em> — but only one way. Goldfish minus koi, not the reverse.'
+              )
+          },
+          {
+            title: 'Step 4 — Form Equation (2) from the April total',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                "Total fish in April was <strong>1625</strong>" combines the April quantities:
+                goldfish = <strong>5p</strong>, koi = <strong>4u</strong>.
+              </p>` +
+              workArea('Equation (2) — April',
+                eqRow([
+                  { type: 'var-a', text: '5p' }, { type: 'plus' },
+                  { type: 'var-b', text: '4u' }, { type: 'eq' },
+                  { type: 'value', text: '1625' }
+                ], { label: '(2)', classNames: 'is-target' })
+              ) +
+              workArea('Both equations side by side',
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'minus' },
+                  { type: 'var-b', text: '5u' }, { type: 'eq' },
+                  { type: 'value', text: '480' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'var-a', text: '5p' }, { type: 'plus' },
+                  { type: 'var-b', text: '4u' }, { type: 'eq' },
+                  { type: 'value', text: '1625' }
+                ], { label: '(2)' })
+              )
+          },
+          {
+            title: 'Step 5 — Pick a strategy: eliminate the units (u)',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('elim',
+                'We need the <strong>March goldfish (4p)</strong>, so we want to eliminate <strong>u</strong> (the koi units). The u-coefficients are 5 and 4 — make them match by scaling each equation to <strong>20u</strong>.'
+              ) +
+              `<p class="step-explanation">
+                <strong>Why 20u?</strong> Because 20 is the <em>lowest common multiple</em> of 5 and 4.
+                Scaling to the LCM is the cleanest way to align coefficients.
+              </p>` +
+              workArea('Multiply Equation (1) by 4',
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'minus' },
+                  { type: 'var-b', text: '5u' }, { type: 'eq' },
+                  { type: 'value', text: '480' }
+                ], { label: '(1)', badge: '× 4' }) +
+                eqRow([
+                  { type: 'var-a', text: '16p' }, { type: 'minus' },
+                  { type: 'var-b', text: '20u' }, { type: 'eq' },
+                  { type: 'value', text: '1920' }
+                ], { label: '(1′)', classNames: 'is-derived' })
+              ) +
+              workArea('Multiply Equation (2) by 5',
+                eqRow([
+                  { type: 'var-a', text: '5p' }, { type: 'plus' },
+                  { type: 'var-b', text: '4u' }, { type: 'eq' },
+                  { type: 'value', text: '1625' }
+                ], { label: '(2)', badge: '× 5' }) +
+                eqRow([
+                  { type: 'var-a', text: '25p' }, { type: 'plus' },
+                  { type: 'var-b', text: '20u' }, { type: 'eq' },
+                  { type: 'value', text: '8125' }
+                ], { label: '(2′)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 6 — Add to eliminate u',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Equation (1′) has <strong>−20u</strong>; equation (2′) has <strong>+20u</strong>. They are <em>opposite</em>,
+                so we <strong>add</strong> the equations to cancel u.
+              </p>` +
+              workArea('Add (1′) + (2′)',
+                eqRow([
+                  { type: 'var-a', text: '16p' }, { type: 'minus' },
+                  { type: 'var-b', text: '20u' }, { type: 'eq' },
+                  { type: 'value', text: '1920' }
+                ], { label: '(1′)' }) +
+                eqRow([
+                  { type: 'var-a', text: '25p' }, { type: 'plus' },
+                  { type: 'var-b', text: '20u' }, { type: 'eq' },
+                  { type: 'value', text: '8125' }
+                ], { label: '(2′)', badge: 'add' }) +
+                eqRow([
+                  { type: 'var-a', text: '41p' }, { type: 'eq' },
+                  { type: 'value', text: '10045' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Solve for 1 part',
+                eqRow([
+                  { type: 'value', text: '1p' }, { type: 'eq' },
+                  { type: 'num', text: '10045' }, { type: 'op', text: '÷' },
+                  { type: 'num', text: '41' }, { type: 'eq' },
+                  { type: 'value', text: '245' }
+                ], { classNames: 'is-result' })
+              ) +
+              takeaway(
+                'When like-coefficients have <strong>opposite signs</strong>, add. ' +
+                'When they have the <strong>same sign</strong>, subtract. The arithmetic dictates the move.'
+              )
+          },
+          {
+            title: 'Step 7 — Compute March goldfish (4p)',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                The question asked for <strong>March goldfish</strong>, which is <strong>4p</strong>. Multiply.
+              </p>` +
+              workArea('Final calculation',
+                eqRow([
+                  { type: 'value', text: '4p' }, { type: 'eq' },
+                  { type: 'num', text: '4' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '245' }, { type: 'eq' },
+                  { type: 'value', text: '980' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Sanity check — does it satisfy both equations?',
+                `<p class="step-explanation">
+                  March koi = 5u, where u comes from Eq (1): 4(245) − 5u = 480 → 980 − 5u = 480 → 5u = 500 → <strong>u = 100</strong>.<br>
+                  April total = 5p + 4u = 5(245) + 4(100) = 1225 + 400 = <strong>1625</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Goldfish in March', '980 goldfish') +
+              takeaway(
+                '<strong>Why parts and units?</strong> Two independent percent-change ratios live in different "currencies". ' +
+                'Parts (p) for goldfish, units (u) for koi — never mix them. ' +
+                'Once both equations are written in p and u, simultaneous elimination handles the rest.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q6: Mix, two-part question with "unchanged" tactic ---------- */
+      {
+        id: 6,
+        title: 'Ravi &amp; Sara\'s Money',
+        type: 'mix',
+        tagText: 'Two-part Q',
+        difficulty: 'Challenging',
+        questionParts: [
+          { text: 'At first, ' },
+          { text: '⅕ of Ravi\'s money was the same as ¼ of Sara\'s money', fact: 'f1' },
+          { text: '. Sara\'s grandmother ' },
+          { text: 'gave her $120', fact: 'f2' },
+          { text: ' later, while Ravi ' },
+          { text: 'spent $200', fact: 'f2' },
+          { text: '. In the end, ' },
+          { text: 'the ratio of Sara\'s money to Ravi\'s became 6 : 5', fact: 'f3' },
+          { text: '. (a) ' },
+          { text: 'How much did Ravi have at first', fact: 'ask' },
+          { text: '<span class="qmark">?</span> (b) How much did Sara have in the end<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Decode "⅕ of Ravi = ¼ of Sara" into an initial ratio',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                "⅕ of Ravi" and "¼ of Sara" are the <strong>same amount</strong>. That means each one represents
+                the <em>shared building block</em>. So Ravi has <strong>5</strong> of those blocks and Sara has <strong>4</strong> —
+                giving the ratio <strong>R : S = 5 : 4</strong>.
+              </p>` +
+              workArea('Convert fractions to a ratio',
+                eqRow([
+                  { type: 'value', text: '⅕ × R' }, { type: 'eq' },
+                  { type: 'value', text: '¼ × S' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: 'R : S' }, { type: 'eq' },
+                  { type: 'var-a', text: '5' }, { type: 'op', text: ':' },
+                  { type: 'var-a', text: '4' }
+                ], { classNames: 'is-derived' })
+              ) +
+              takeaway(
+                'Whenever you read "<strong>fraction-of-A = fraction-of-B</strong>", flip the fractions to get the ratio of A : B. ' +
+                'Here ⅕ vs ¼ becomes 5 : 4.'
+              )
+          },
+          {
+            title: 'Step 2 — Spot the "two ratios, nothing unchanged" trap',
+            highlights: ['f1', 'f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                We are given <strong>two ratios</strong>: the initial 5 : 4, and the final 6 : 5. But Ravi <em>spent</em> $200 (his amount changed)
+                and Sara <em>received</em> $120 (her amount changed). <strong>Both quantities changed</strong> — there is nothing unchanged
+                to anchor a single ratio. This is the classic signal to use <strong>units &amp; parts</strong>.
+              </p>` +
+              strategyBanner('mix',
+                'Use <strong>parts (p)</strong> for the initial ratio and <strong>units (u)</strong> for the final ratio. Then form two simultaneous equations.'
+              ) +
+              ledger(
+                {
+                  title: 'Initial — parts (p)',
+                  rows: [
+                    { label: 'Ravi', val: '5p' },
+                    { label: 'Sara', val: '4p' }
+                  ]
+                },
+                {
+                  title: 'Final — units (u)',
+                  rows: [
+                    { label: 'Sara', val: '6u' },
+                    { label: 'Ravi', val: '5u' }
+                  ]
+                }
+              )
+          },
+          {
+            title: 'Step 3 — Form Equation (1) from Sara\'s journey',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Sara started with <strong>4p</strong>, then received <strong>+$120</strong>, ending with <strong>6u</strong>.
+              </p>` +
+              workArea('Equation (1) — Sara',
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'plus' },
+                  { type: 'value', text: '$120' }, { type: 'eq' },
+                  { type: 'var-b', text: '6u' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 4 — Form Equation (2) from Ravi\'s journey',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Ravi started with <strong>5p</strong>, then spent <strong>−$200</strong>, ending with <strong>5u</strong>.
+              </p>` +
+              workArea('Equation (2) — Ravi',
+                eqRow([
+                  { type: 'var-a', text: '5p' }, { type: 'minus' },
+                  { type: 'value', text: '$200' }, { type: 'eq' },
+                  { type: 'var-b', text: '5u' }
+                ], { label: '(2)', classNames: 'is-target' })
+              ) +
+              takeaway(
+                'A "lucky" coefficient of 5 on both sides of equation (2) means we can <strong>simplify by ÷ 5</strong> immediately.'
+              )
+          },
+          {
+            title: 'Step 5 — Simplify Equation (2)',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Divide equation (2) by 5 to make every coefficient as small as possible. The result expresses
+                <strong>1u directly in terms of p</strong>, which we can substitute into equation (1).
+              </p>` +
+              workArea('Equation (2) ÷ 5',
+                eqRow([
+                  { type: 'var-a', text: '5p' }, { type: 'minus' },
+                  { type: 'value', text: '$200' }, { type: 'eq' },
+                  { type: 'var-b', text: '5u' }
+                ], { label: '(2)', badge: '÷ 5' }) +
+                eqRow([
+                  { type: 'var-a', text: 'p' }, { type: 'minus' },
+                  { type: 'value', text: '$40' }, { type: 'eq' },
+                  { type: 'var-b', text: 'u' }
+                ], { label: '(2′)', classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 6 — Substitute u into Equation (1)',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'Equation (2′) gives us <strong>u = p − $40</strong>. Substitute that into equation (1) to get a single equation in p alone.'
+              ) +
+              workArea('Substitution',
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'plus' },
+                  { type: 'value', text: '$120' }, { type: 'eq' },
+                  { type: 'var-b', text: '6u' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'plus' },
+                  { type: 'value', text: '$120' }, { type: 'eq' },
+                  { type: 'num', text: '6' }, { type: 'op', text: '×' },
+                  { type: 'var-b', text: '(p − $40)' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '4p' }, { type: 'plus' },
+                  { type: 'value', text: '$120' }, { type: 'eq' },
+                  { type: 'var-b', text: '6p' }, { type: 'minus' },
+                  { type: 'value', text: '$240' }
+                ], { classNames: 'is-derived' })
+              ) +
+              workArea('Collect like terms',
+                eqRow([
+                  { type: 'value', text: '$120 + $240' }, { type: 'eq' },
+                  { type: 'var-b', text: '6p' }, { type: 'minus' },
+                  { type: 'var-a', text: '4p' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: '$360' }, { type: 'eq' },
+                  { type: 'var-a', text: '2p' }
+                ], { classNames: 'is-result' }) +
+                eqRow([
+                  { type: 'value', text: '1p' }, { type: 'eq' },
+                  { type: 'value', text: '$180' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 7 (a) — Ravi\'s money at first',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Ravi had <strong>5p</strong> at first. We just found 1p = $180.
+              </p>` +
+              workArea('Part (a)',
+                eqRow([
+                  { type: 'value', text: 'Ravi at first' }, { type: 'eq' },
+                  { type: 'num', text: '5' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '$180' }, { type: 'eq' },
+                  { type: 'value', text: '$900' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 8 (b) — Sara\'s money in the end',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Sara ended with <strong>6u</strong>. We use <strong>u = p − $40 = $180 − $40 = $140</strong>, then
+                multiply by 6. Or, equivalently, take her starting <strong>4p = $720</strong> and add the <strong>$120</strong> she received.
+              </p>` +
+              workArea('Two equivalent paths',
+                eqRow([
+                  { type: 'value', text: '6u' }, { type: 'eq' },
+                  { type: 'num', text: '6' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '$140' }, { type: 'eq' },
+                  { type: 'value', text: '$840' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '4p + $120' }, { type: 'eq' },
+                  { type: 'num', text: '$720' }, { type: 'op', text: '+' },
+                  { type: 'num', text: '$120' }, { type: 'eq' },
+                  { type: 'value', text: '$840' }
+                ], { classNames: 'is-result' })
+              ) +
+              takeaway(
+                'Both routes give $840. <strong>Always sanity-check by computing the answer two ways</strong> when possible.'
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('(a) Ravi at first', '$900', '(b) Sara in the end: $840') +
+              takeaway(
+                '<strong>The big idea:</strong> When two ratios are given <em>and</em> both quantities change, no quantity is "unchanged" to lock down. ' +
+                'Use <strong>parts</strong> for one ratio, <strong>units</strong> for the other, then build two equations and eliminate or substitute as usual.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q7: Elimination, "remove some, then total = k × remaining" ---------- */
+      {
+        id: 7,
+        title: 'Red &amp; Green Balls in the Box',
+        type: 'elim',
+        tagText: 'Elimination',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'There were some red and green balls in a box. If ' },
+          { text: '18 red balls were removed, the total left would be 6 times the number of red balls left', fact: 'f1' },
+          { text: '. If ' },
+          { text: '36 green balls were removed instead, the total left would be 4 times the number of red balls', fact: 'f2' },
+          { text: '. ' },
+          { text: 'How many balls were there in total', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Define variables and unpack scenario A',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Let <strong>R</strong> = number of red balls and <strong>G</strong> = number of green balls.
+                Notice the question describes <em>two hypothetical scenarios</em> — but in both cases, R and G refer to the
+                <strong>original</strong> counts.
+              </p>` +
+              workArea('Scenario A: remove 18 red',
+                `<p class="step-explanation">
+                  Total balls left = (R + G) − 18. Red balls left = R − 18.<br>
+                  The condition says the total left is <strong>6 times</strong> the red left:
+                </p>` +
+                eqRow([
+                  { type: 'value', text: '(R + G) − 18' }, { type: 'eq' },
+                  { type: 'num', text: '6' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(R − 18)' }
+                ], { classNames: 'is-target' })
+              ) +
+              takeaway(
+                'A common pitfall: students forget that "<strong>total left</strong>" includes both colours minus what was removed. ' +
+                'Always define <em>each side</em> in plain English before turning it into algebra.'
+              )
+          },
+          {
+            title: 'Step 2 — Expand and simplify Equation (1)',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Multiply out the right side, then collect everything to express <strong>G in terms of R</strong>.
+              </p>` +
+              workArea('Expand the right side',
+                eqRow([
+                  { type: 'value', text: 'R + G − 18' }, { type: 'eq' },
+                  { type: 'value', text: '6R − 108' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: 'G' }, { type: 'eq' },
+                  { type: 'var-a', text: '6R' }, { type: 'minus' },
+                  { type: 'value', text: '108' }, { type: 'minus' },
+                  { type: 'var-a', text: 'R' }, { type: 'plus' },
+                  { type: 'value', text: '18' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'G' }, { type: 'eq' },
+                  { type: 'var-a', text: '5R' }, { type: 'minus' },
+                  { type: 'value', text: '90' }
+                ], { label: '(1)', classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 3 — Unpack scenario B and simplify Equation (2)',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Scenario B removes <strong>green</strong> balls — so the red count is unchanged. Total left = (R + G) − 36; red left = R.
+              </p>` +
+              workArea('Equation (2) — scenario B',
+                eqRow([
+                  { type: 'value', text: '(R + G) − 36' }, { type: 'eq' },
+                  { type: 'num', text: '4' }, { type: 'op', text: '×' },
+                  { type: 'var-a', text: 'R' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: 'R' }, { type: 'plus' },
+                  { type: 'var-a', text: 'G' }, { type: 'minus' },
+                  { type: 'value', text: '36' }, { type: 'eq' },
+                  { type: 'var-a', text: '4R' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'G' }, { type: 'eq' },
+                  { type: 'var-a', text: '3R' }, { type: 'plus' },
+                  { type: 'value', text: '36' }
+                ], { label: '(2)', classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 4 — Choose a strategy: equate the two expressions for G',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('elim',
+                'Both equations isolate <strong>G</strong>. Setting <strong>(1) = (2)</strong> eliminates G in one stroke and leaves a single equation in R.'
+              ) +
+              `<p class="step-explanation">
+                This is a special case of elimination: when both equations are already solved for the same variable,
+                you can chain them directly: <strong>5R − 90 = 3R + 36</strong>.
+              </p>`
+          },
+          {
+            title: 'Step 5 — Solve for R',
+            highlights: ['ask'],
+            content: () =>
+              workArea('Equate (1) and (2)',
+                eqRow([
+                  { type: 'var-a', text: '5R' }, { type: 'minus' },
+                  { type: 'value', text: '90' }, { type: 'eq' },
+                  { type: 'var-a', text: '3R' }, { type: 'plus' },
+                  { type: 'value', text: '36' }
+                ], { classNames: 'is-target' }) +
+                eqRow([
+                  { type: 'var-a', text: '5R' }, { type: 'minus' },
+                  { type: 'var-a', text: '3R' }, { type: 'eq' },
+                  { type: 'value', text: '36 + 90' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '2R' }, { type: 'eq' },
+                  { type: 'value', text: '126' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'R' }, { type: 'eq' },
+                  { type: 'value', text: '63' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Compute G and the grand total',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Plug R = 63 back into either equation. Equation (2) is simpler.
+              </p>` +
+              workArea('Find G',
+                eqRow([
+                  { type: 'var-a', text: 'G' }, { type: 'eq' },
+                  { type: 'num', text: '3' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '63' }, { type: 'plus' },
+                  { type: 'value', text: '36' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: 'G' }, { type: 'eq' },
+                  { type: 'value', text: '189 + 36' }, { type: 'eq' },
+                  { type: 'value', text: '225' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Grand total',
+                eqRow([
+                  { type: 'value', text: 'Total' }, { type: 'eq' },
+                  { type: 'value', text: 'R + G' }, { type: 'eq' },
+                  { type: 'num', text: '63' }, { type: 'plus' },
+                  { type: 'num', text: '225' }, { type: 'eq' },
+                  { type: 'value', text: '288' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Sanity check — scenario A',
+                `<p class="step-explanation">
+                  Total left = 288 − 18 = 270. Red left = 63 − 18 = 45. Ratio: 270 ÷ 45 = <strong>6</strong> ✓
+                </p>`
+              ) +
+              workArea('Sanity check — scenario B',
+                `<p class="step-explanation">
+                  Total left = 288 − 36 = 252. Red = 63 (unchanged). Ratio: 252 ÷ 63 = <strong>4</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Total balls in the box', '288 balls') +
+              takeaway(
+                '<strong>Pattern recognition:</strong> when a question says "<em>total left = k × something left</em>" twice with two different removals, ' +
+                'each scenario gives one equation. Isolate the same variable in both, then equate.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q8: Mix, "fraction of the whole was packed in X" ---------- */
+      {
+        id: 8,
+        title: 'Mr Chen\'s Marble Bags',
+        type: 'mix',
+        tagText: 'Units &amp; Parts',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'Mr Chen packed marbles into ' },
+          { text: '12 small bags and 18 big bags', fact: 'f1' },
+          { text: '. ' },
+          { text: 'Each big bag held 4 more marbles than each small bag', fact: 'f2' },
+          { text: '. ' },
+          { text: 'One-third of all the marbles were in the small bags', fact: 'f3' },
+          { text: '. ' },
+          { text: 'How many marbles were in each small bag', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Set up letters for "marbles per bag"',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Let <strong>S</strong> = number of marbles in <em>each</em> small bag, and <strong>B</strong> = number in <em>each</em> big bag.
+                These are <strong>per-bag</strong> counts, not totals.
+              </p>` +
+              workArea('Total marbles in each kind of bag',
+                eqRow([
+                  { type: 'value', text: 'Marbles in small bags' }, { type: 'eq' },
+                  { type: 'num', text: '12' }, { type: 'op', text: '×' },
+                  { type: 'var-a', text: 'S' }, { type: 'eq' },
+                  { type: 'var-a', text: '12S' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: 'Marbles in big bags' }, { type: 'eq' },
+                  { type: 'num', text: '18' }, { type: 'op', text: '×' },
+                  { type: 'var-b', text: 'B' }, { type: 'eq' },
+                  { type: 'var-b', text: '18B' }
+                ])
+              )
+          },
+          {
+            title: 'Step 2 — Equation (1) from "4 more marbles per bag"',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Each big bag has <strong>4 more</strong> marbles than each small bag — that\'s a <em>per-bag</em> comparison.
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-b', text: 'B' }, { type: 'eq' },
+                  { type: 'var-a', text: 'S' }, { type: 'plus' },
+                  { type: 'value', text: '4' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 3 — Equation (2) from "⅓ of all marbles"',
+            highlights: ['f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Total marbles = <strong>12S + 18B</strong>. Marbles in small bags = <strong>12S</strong>. The condition says:
+              </p>` +
+              workArea('Equation (2) — translate the fraction',
+                eqRow([
+                  { type: 'var-a', text: '12S' }, { type: 'eq' },
+                  { type: 'value', text: '⅓ ×' }, { type: 'value', text: '(12S + 18B)' }
+                ], { label: '(2)', classNames: 'is-target' })
+              ) +
+              takeaway(
+                'When you see "<strong>⅓ of all</strong>", the numerator is the part and the denominator is the whole. ' +
+                'Multiply both sides by 3 to clear the fraction immediately.'
+              )
+          },
+          {
+            title: 'Step 4 — Clear the fraction in (2)',
+            highlights: ['f3'],
+            content: () =>
+              workArea('Multiply both sides by 3',
+                eqRow([
+                  { type: 'var-a', text: '12S' }, { type: 'eq' },
+                  { type: 'value', text: '⅓(12S + 18B)' }
+                ], { label: '(2)', badge: '× 3' }) +
+                eqRow([
+                  { type: 'var-a', text: '36S' }, { type: 'eq' },
+                  { type: 'var-a', text: '12S' }, { type: 'plus' },
+                  { type: 'var-b', text: '18B' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '24S' }, { type: 'eq' },
+                  { type: 'var-b', text: '18B' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '4S' }, { type: 'eq' },
+                  { type: 'var-b', text: '3B' }
+                ], { label: '(2′)', classNames: 'is-result' })
+              ) +
+              takeaway(
+                'Always simplify by dividing through whenever every coefficient shares a common factor. ' +
+                'Here both sides are divisible by <strong>6</strong>, taking 24 vs 18 down to 4 vs 3.'
+              )
+          },
+          {
+            title: 'Step 5 — Substitute (1) into (2′)',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'Equation (1) gives <strong>B = S + 4</strong>. Substitute that directly into the simplified (2′) to remove B.'
+              ) +
+              workArea('Substitute B = S + 4',
+                eqRow([
+                  { type: 'var-a', text: '4S' }, { type: 'eq' },
+                  { type: 'var-b', text: '3B' }
+                ], { label: '(2′)' }) +
+                eqRow([
+                  { type: 'var-a', text: '4S' }, { type: 'eq' },
+                  { type: 'num', text: '3' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(S + 4)' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '4S' }, { type: 'eq' },
+                  { type: 'var-a', text: '3S' }, { type: 'plus' },
+                  { type: 'value', text: '12' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'S' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Verify the answer is consistent',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                S = 12, so B = S + 4 = <strong>16</strong>. Total marbles = 12(12) + 18(16) = <strong>144 + 288 = 432</strong>.
+                Marbles in small bags = 144 = ⅓ × 432 ✓
+              </p>` +
+              workArea('Final ledger',
+                ledger(
+                  {
+                    title: 'Small bags',
+                    rows: [
+                      { label: 'Per bag', val: '12' },
+                      { label: 'Bags', val: '12' },
+                      { label: 'Subtotal', val: '144' }
+                    ]
+                  },
+                  {
+                    title: 'Big bags',
+                    rows: [
+                      { label: 'Per bag', val: '16' },
+                      { label: 'Bags', val: '18' },
+                      { label: 'Subtotal', val: '288' }
+                    ]
+                  }
+                )
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Marbles in each small bag', '12 marbles') +
+              takeaway(
+                '<strong>Two perspectives, one answer:</strong> equation (1) compares <em>per-bag</em> contents; equation (2) compares <em>total</em> contents. ' +
+                'The simultaneous concept ties them together.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q9: Mix, two ratios + total relationship ---------- */
+      {
+        id: 9,
+        title: 'Badminton Clubs Alpha &amp; Beta',
+        type: 'mix',
+        tagText: 'Units &amp; Parts',
+        difficulty: 'Challenging',
+        questionParts: [
+          { text: 'In two badminton clubs, Alpha and Beta, ' },
+          { text: 'the total number of girls was 100% more than the total number of boys', fact: 'f1' },
+          { text: '. ' },
+          { text: 'In Alpha, the boys-to-girls ratio was 3 : 4', fact: 'f2' },
+          { text: ', and ' },
+          { text: 'in Beta, the boys-to-girls ratio was 1 : 6', fact: 'f3' },
+          { text: '. If there were ' },
+          { text: '12 more girls in Alpha than in Beta', fact: 'f1' },
+          { text: ', ' },
+          { text: 'how many members were in Alpha', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Decode "100% more"',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                "<strong>100% more</strong>" means <em>doubled</em>. So the total number of girls (in both clubs combined)
+                is <strong>twice</strong> the total number of boys.
+              </p>` +
+              workArea('Whole-school totals',
+                eqRow([
+                  { type: 'value', text: 'Total girls' }, { type: 'eq' },
+                  { type: 'num', text: '2' }, { type: 'op', text: '×' },
+                  { type: 'value', text: 'Total boys' }
+                ], { classNames: 'is-target' })
+              ) +
+              takeaway(
+                'A useful translation table: <strong>50% more = ×1.5</strong>, <strong>100% more = ×2</strong>, ' +
+                '<strong>200% more = ×3</strong>, etc. The percentage adds to 100%, then divides by 100.'
+              )
+          },
+          {
+            title: 'Step 2 — Use different letters for the two club ratios',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Alpha and Beta have <strong>different ratios</strong>, so we need <strong>different parts</strong>:
+                use <strong>a</strong> for Alpha and <strong>b</strong> for Beta.
+              </p>` +
+              ledger(
+                {
+                  title: 'Alpha — parts (a)',
+                  rows: [
+                    { label: 'Boys', val: '3a' },
+                    { label: 'Girls', val: '4a' },
+                    { label: 'Total', val: '7a' }
+                  ]
+                },
+                {
+                  title: 'Beta — parts (b)',
+                  rows: [
+                    { label: 'Boys', val: 'b' },
+                    { label: 'Girls', val: '6b' },
+                    { label: 'Total', val: '7b' }
+                  ]
+                }
+              ) +
+              takeaway(
+                'Beautiful coincidence: each club\'s "total" is <strong>7 of its own parts</strong>. ' +
+                'But remember: 7a and 7b are <em>not</em> the same — a ≠ b.'
+              )
+          },
+          {
+            title: 'Step 3 — Form Equation (1) from the total-girls / total-boys relationship',
+            highlights: ['f1', 'f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Total boys = 3a + b. Total girls = 4a + 6b. Apply the doubled-girls condition.
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-a', text: '4a' }, { type: 'plus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'num', text: '2' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(3a + b)' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'var-a', text: '4a' }, { type: 'plus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'var-a', text: '6a' }, { type: 'plus' },
+                  { type: 'var-b', text: '2b' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: '4b' }, { type: 'eq' },
+                  { type: 'var-a', text: '2a' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'a' }, { type: 'eq' },
+                  { type: 'var-b', text: '2b' }
+                ], { label: '(1′)', classNames: 'is-result' })
+              ) +
+              takeaway(
+                'We just discovered <strong>a = 2b</strong> — Alpha\'s parts are <em>twice as big</em> as Beta\'s. ' +
+                'This is the bridge between the two ratios.'
+              )
+          },
+          {
+            title: 'Step 4 — Form Equation (2) from "12 more girls in Alpha"',
+            highlights: ['f1', 'f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                "<strong>12 more girls in Alpha than in Beta</strong>" → Alpha girls minus Beta girls = 12.
+              </p>` +
+              workArea('Equation (2)',
+                eqRow([
+                  { type: 'var-a', text: '4a' }, { type: 'minus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { label: '(2)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 5 — Substitute a = 2b into (2)',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'We have <strong>a = 2b</strong> from (1′). Substitute into (2) to leave only b.'
+              ) +
+              workArea('Substitution',
+                eqRow([
+                  { type: 'var-a', text: '4a' }, { type: 'minus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { label: '(2)' }) +
+                eqRow([
+                  { type: 'num', text: '4' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(2b)' }, { type: 'minus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: '8b' }, { type: 'minus' },
+                  { type: 'var-b', text: '6b' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: '2b' }, { type: 'eq' },
+                  { type: 'value', text: '12' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: 'b' }, { type: 'eq' },
+                  { type: 'value', text: '6' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Compute Alpha membership',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                With b = 6, we get a = 2b = 12. The number of pupils in Alpha is <strong>7a</strong>.
+              </p>` +
+              workArea('Alpha total',
+                eqRow([
+                  { type: 'value', text: 'Alpha members' }, { type: 'eq' },
+                  { type: 'num', text: '7' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '12' }, { type: 'eq' },
+                  { type: 'value', text: '84' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Sanity check',
+                ledger(
+                  {
+                    title: 'Alpha (a = 12)',
+                    rows: [
+                      { label: 'Boys (3a)', val: '36' },
+                      { label: 'Girls (4a)', val: '48' },
+                      { label: 'Total (7a)', val: '84' }
+                    ]
+                  },
+                  {
+                    title: 'Beta (b = 6)',
+                    rows: [
+                      { label: 'Boys (b)', val: '6' },
+                      { label: 'Girls (6b)', val: '36' },
+                      { label: 'Total (7b)', val: '42' }
+                    ]
+                  }
+                ) +
+                `<p class="step-explanation">
+                  Total boys = 36 + 6 = <strong>42</strong>. Total girls = 48 + 36 = <strong>84</strong>. Girls is exactly 2× boys ✓<br>
+                  Alpha girls − Beta girls = 48 − 36 = <strong>12</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Members in Alpha', '84 pupils') +
+              takeaway(
+                '<strong>Two-club lesson:</strong> when each club has its own ratio, give each its own letter (a, b). ' +
+                'Then the "global" condition (total girls = 2 × total boys) becomes a single equation linking a and b.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q10: Mix, two-day percent change + ticket revenue ---------- */
+      {
+        id: 10,
+        title: 'Science Exhibition Ticket Sales',
+        type: 'mix',
+        tagText: 'Units &amp; Parts',
+        difficulty: 'Challenging',
+        questionParts: [
+          { text: 'On Friday, ' },
+          { text: 'there were 80 more girls than boys', fact: 'f1' },
+          { text: ' at the science exhibition. On Saturday, the number of boys ' },
+          { text: 'increased by 25%', fact: 'f2' },
+          { text: ' and the number of girls ' },
+          { text: 'decreased by 25%', fact: 'f3' },
+          { text: '. There were ' },
+          { text: '700 children on Saturday', fact: 'f2' },
+          { text: '. Each child paid ' },
+          { text: '$5 to enter on either day', fact: 'ask' },
+          { text: '. ' },
+          { text: 'How much money was collected over the two days', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Convert the percent changes into ratios',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Repeat the trick from Q5: percentages → clean ratios.
+              </p>` +
+              workArea('Boys: +25% → Friday : Saturday = 4 : 5',
+                eqRow([
+                  { type: 'value', text: 'Boys Fri : Sat' }, { type: 'eq' },
+                  { type: 'var-a', text: '4' }, { type: 'op', text: ':' },
+                  { type: 'var-a', text: '5' }
+                ])
+              ) +
+              workArea('Girls: −25% → Friday : Saturday = 4 : 3',
+                eqRow([
+                  { type: 'value', text: 'Girls Fri : Sat' }, { type: 'eq' },
+                  { type: 'var-b', text: '4' }, { type: 'op', text: ':' },
+                  { type: 'var-b', text: '3' }
+                ])
+              ) +
+              takeaway(
+                'Heads-up: <strong>+25%</strong> uses 4→5, but <strong>−25%</strong> uses 4→3. They are <em>not</em> mirror images. ' +
+                'Always work it out from "<strong>before is 100%, after is 100% ± rate</strong>".'
+              )
+          },
+          {
+            title: 'Step 2 — Assign units to keep the ratios separate',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Use <strong>b</strong> for boys-units and <strong>g</strong> for girls-units.
+              </p>` +
+              ledger(
+                {
+                  title: 'Boys (units b)',
+                  rows: [
+                    { label: 'Friday', val: '4b' },
+                    { label: 'Saturday', val: '5b' }
+                  ]
+                },
+                {
+                  title: 'Girls (units g)',
+                  rows: [
+                    { label: 'Friday', val: '4g' },
+                    { label: 'Saturday', val: '3g' }
+                  ]
+                }
+              )
+          },
+          {
+            title: 'Step 3 — Equation (1) from "80 more girls on Friday"',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Friday girls minus Friday boys = 80. Using the units:
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-b', text: '4g' }, { type: 'minus' },
+                  { type: 'var-a', text: '4b' }, { type: 'eq' },
+                  { type: 'value', text: '80' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'var-b', text: 'g' }, { type: 'minus' },
+                  { type: 'var-a', text: 'b' }, { type: 'eq' },
+                  { type: 'value', text: '20' }
+                ], { label: '(1′)', badge: '÷ 4', classNames: 'is-result' })
+              ) +
+              takeaway(
+                'Whenever every term has a common factor, <strong>simplify immediately</strong>. ' +
+                'It keeps the algebra clean and reduces arithmetic mistakes later.'
+              )
+          },
+          {
+            title: 'Step 4 — Equation (2) from "700 children on Saturday"',
+            highlights: ['f2', 'f3'],
+            content: () =>
+              `<p class="step-explanation">
+                Saturday boys + Saturday girls = 700:
+              </p>` +
+              workArea('Equation (2)',
+                eqRow([
+                  { type: 'var-a', text: '5b' }, { type: 'plus' },
+                  { type: 'var-b', text: '3g' }, { type: 'eq' },
+                  { type: 'value', text: '700' }
+                ], { label: '(2)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 5 — Substitute g = b + 20 into Equation (2)',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'From (1′): <strong>g = b + 20</strong>. Substitute into (2) to remove g.'
+              ) +
+              workArea('Substitution',
+                eqRow([
+                  { type: 'var-a', text: '5b' }, { type: 'plus' },
+                  { type: 'num', text: '3' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(b + 20)' }, { type: 'eq' },
+                  { type: 'value', text: '700' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: '5b' }, { type: 'plus' },
+                  { type: 'var-a', text: '3b' }, { type: 'plus' },
+                  { type: 'value', text: '60' }, { type: 'eq' },
+                  { type: 'value', text: '700' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '8b' }, { type: 'eq' },
+                  { type: 'value', text: '640' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: 'b' }, { type: 'eq' },
+                  { type: 'value', text: '80' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('And g = b + 20 = 100',
+                eqRow([
+                  { type: 'var-b', text: 'g' }, { type: 'eq' },
+                  { type: 'value', text: '100' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 6 — Count Friday attendance',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                We need both days\' totals. Saturday is already given as 700. For Friday:
+              </p>` +
+              workArea('Friday',
+                eqRow([
+                  { type: 'value', text: 'Friday boys' }, { type: 'eq' },
+                  { type: 'num', text: '4b' }, { type: 'eq' },
+                  { type: 'num', text: '4 × 80' }, { type: 'eq' },
+                  { type: 'value', text: '320' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: 'Friday girls' }, { type: 'eq' },
+                  { type: 'num', text: '4g' }, { type: 'eq' },
+                  { type: 'num', text: '4 × 100' }, { type: 'eq' },
+                  { type: 'value', text: '400' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: 'Friday total' }, { type: 'eq' },
+                  { type: 'value', text: '320 + 400' }, { type: 'eq' },
+                  { type: 'value', text: '720' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Sanity-check Friday',
+                `<p class="step-explanation">
+                  Friday girls (400) − Friday boys (320) = <strong>80</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Step 7 — Compute the total revenue',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Total tickets = Friday + Saturday = 720 + 700. Each ticket = $5.
+              </p>` +
+              workArea('Final calculation',
+                eqRow([
+                  { type: 'value', text: 'Total tickets' }, { type: 'eq' },
+                  { type: 'value', text: '720 + 700' }, { type: 'eq' },
+                  { type: 'value', text: '1420' }
+                ]) +
+                eqRow([
+                  { type: 'value', text: 'Total $' }, { type: 'eq' },
+                  { type: 'num', text: '1420' }, { type: 'op', text: '×' },
+                  { type: 'num', text: '$5' }, { type: 'eq' },
+                  { type: 'value', text: '$7,100' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Total money collected over both days', '$7,100') +
+              takeaway(
+                '<strong>Multi-step questions:</strong> the simultaneous concept does most of the work, ' +
+                'but the final arithmetic step ("× $5") is what the question actually asks. ' +
+                'Underline the question before doing arithmetic — never stop at b = 80.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q11: Mix, "after giving away X, you have a fraction of new total" ---------- */
+      {
+        id: 11,
+        title: 'Hannah &amp; Ivan\'s Erasers',
+        type: 'mix',
+        tagText: 'Substitution',
+        difficulty: 'Challenging',
+        questionParts: [
+          { text: 'Hannah and Ivan have some erasers altogether. If ' },
+          { text: 'Hannah gives away 12 erasers, Hannah has ½ of the new total', fact: 'f1' },
+          { text: '. If ' },
+          { text: 'Ivan gives away 12 erasers instead, Ivan has ⅖ of the new total', fact: 'f2' },
+          { text: '. ' },
+          { text: 'How many erasers do they have altogether', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Define variables for the original counts',
+            highlights: ['f1', 'f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Let <strong>H</strong> = Hannah\'s original number, <strong>I</strong> = Ivan\'s original number, and <strong>T</strong> = total = H + I.
+                Both scenarios involve <em>giving away 12</em>, so the new total in each case is <strong>T − 12</strong>.
+              </p>` +
+              takeaway(
+                'A subtle but key observation: <strong>only one person gives away erasers in each scenario</strong>, ' +
+                'but the <em>total drops by 12 either way</em>. So the "new total" T − 12 is the same expression in both equations.'
+              )
+          },
+          {
+            title: 'Step 2 — Equation (1): Hannah\'s scenario',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                After Hannah gives away 12, she has <strong>H − 12</strong>, and the new total is <strong>T − 12</strong>.
+                The condition: H\'s leftover = ½ of the new total.
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'value', text: 'H − 12' }, { type: 'eq' },
+                  { type: 'value', text: '½ ×' }, { type: 'value', text: '(T − 12)' }
+                ], { label: '(1)' }) +
+                eqRow([
+                  { type: 'num', text: '2' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(H − 12)' }, { type: 'eq' },
+                  { type: 'value', text: 'T − 12' }
+                ], { badge: '× 2', classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '2H' }, { type: 'minus' },
+                  { type: 'value', text: '24' }, { type: 'eq' },
+                  { type: 'value', text: 'T − 12' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '2H' }, { type: 'eq' },
+                  { type: 'value', text: 'T + 12' }
+                ], { label: '(1′)', classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 3 — Equation (2): Ivan\'s scenario',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                Same setup with Ivan: I − 12 = ⅖(T − 12). Multiply by 5 to clear the fraction.
+              </p>` +
+              workArea('Equation (2)',
+                eqRow([
+                  { type: 'value', text: 'I − 12' }, { type: 'eq' },
+                  { type: 'value', text: '⅖ ×' }, { type: 'value', text: '(T − 12)' }
+                ], { label: '(2)' }) +
+                eqRow([
+                  { type: 'num', text: '5' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(I − 12)' }, { type: 'eq' },
+                  { type: 'num', text: '2' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(T − 12)' }
+                ], { badge: '× 5', classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: '5I' }, { type: 'minus' },
+                  { type: 'value', text: '60' }, { type: 'eq' },
+                  { type: 'value', text: '2T − 24' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: '5I' }, { type: 'eq' },
+                  { type: 'value', text: '2T + 36' }
+                ], { label: '(2′)', classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 4 — Pin down a relation: H + I = T',
+            highlights: ['f1', 'f2', 'ask'],
+            content: () =>
+              `<p class="step-explanation">
+                We have <em>three</em> unknowns (H, I, T) but only two situational equations. The <strong>third equation</strong>
+                comes from the definition of total:
+              </p>` +
+              workArea('Equation (3)',
+                eqRow([
+                  { type: 'var-a', text: 'H' }, { type: 'plus' },
+                  { type: 'var-b', text: 'I' }, { type: 'eq' },
+                  { type: 'value', text: 'T' }
+                ], { label: '(3)', classNames: 'is-target' })
+              ) +
+              takeaway(
+                'When a question gives you "<strong>some erasers altogether</strong>" but no specific total, ' +
+                '<em>introduce</em> the variable T yourself. Then <strong>H + I = T</strong> is your free third equation.'
+              )
+          },
+          {
+            title: 'Step 5 — Choose a strategy: express H and I in terms of T',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'Equation (1′) gives <strong>H = (T + 12)/2</strong> and (2′) gives <strong>I = (2T + 36)/5</strong>. Substitute both into (3) to get a single equation in T.'
+              ) +
+              workArea('Express H from (1′)',
+                eqRow([
+                  { type: 'var-a', text: '2H' }, { type: 'eq' },
+                  { type: 'value', text: 'T + 12' }
+                ]) +
+                eqRow([
+                  { type: 'var-a', text: 'H' }, { type: 'eq' },
+                  { type: 'value', text: '(T + 12) ÷ 2' }
+                ], { classNames: 'is-derived' })
+              ) +
+              workArea('Express I from (2′)',
+                eqRow([
+                  { type: 'var-b', text: '5I' }, { type: 'eq' },
+                  { type: 'value', text: '2T + 36' }
+                ]) +
+                eqRow([
+                  { type: 'var-b', text: 'I' }, { type: 'eq' },
+                  { type: 'value', text: '(2T + 36) ÷ 5' }
+                ], { classNames: 'is-derived' })
+              )
+          },
+          {
+            title: 'Step 6 — Substitute into (3) and solve for T',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                Plug both expressions into <strong>H + I = T</strong>. To clear fractions, multiply through by <strong>10</strong>
+                (the LCM of denominators 2 and 5).
+              </p>` +
+              workArea('Combine and clear fractions',
+                eqRow([
+                  { type: 'value', text: '(T+12)/2' }, { type: 'plus' },
+                  { type: 'value', text: '(2T+36)/5' }, { type: 'eq' },
+                  { type: 'value', text: 'T' }
+                ]) +
+                eqRow([
+                  { type: 'num', text: '5' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(T+12)' }, { type: 'plus' },
+                  { type: 'num', text: '2' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(2T+36)' }, { type: 'eq' },
+                  { type: 'num', text: '10' }, { type: 'op', text: '×' },
+                  { type: 'value', text: 'T' }
+                ], { badge: '× 10', classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '5T + 60' }, { type: 'plus' },
+                  { type: 'value', text: '4T + 72' }, { type: 'eq' },
+                  { type: 'value', text: '10T' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '9T + 132' }, { type: 'eq' },
+                  { type: 'value', text: '10T' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: 'T' }, { type: 'eq' },
+                  { type: 'value', text: '132' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 7 — Verify with explicit H and I',
+            highlights: ['ask'],
+            content: () =>
+              `<p class="step-explanation">
+                T = 132 → H = (132 + 12) ÷ 2 = <strong>72</strong>; I = (264 + 36) ÷ 5 = 300 ÷ 5 = <strong>60</strong>.
+                Check H + I = 72 + 60 = 132 ✓
+              </p>` +
+              workArea('Scenario A check',
+                `<p class="step-explanation">
+                  Hannah gives 12: she keeps 60. New total = 120. Ratio: 60/120 = <strong>½</strong> ✓
+                </p>`
+              ) +
+              workArea('Scenario B check',
+                `<p class="step-explanation">
+                  Ivan gives 12: he keeps 48. New total = 120. Ratio: 48/120 = <strong>⅖</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Total erasers altogether', '132 erasers') +
+              takeaway(
+                '<strong>The trick of introducing T:</strong> when the question speaks of "altogether" without giving you the number, ' +
+                'invent a letter for it. Then "H + I = T" becomes the missing third equation that ties everything together.'
+              )
+          }
+        ]
+      },
+
+      /* ---------- Q12: Mix, two simple linear conditions on savings ---------- */
+      {
+        id: 12,
+        title: 'Sam &amp; Tina\'s Savings',
+        type: 'mix',
+        tagText: 'Elimination',
+        difficulty: 'Intermediate',
+        questionParts: [
+          { text: 'Sam and Tina ' },
+          { text: 'saved $3000 altogether', fact: 'f1' },
+          { text: '. ' },
+          { text: '25% of Sam\'s savings was $60 more than 15% of Tina\'s savings', fact: 'f2' },
+          { text: '. ' },
+          { text: 'How much more money than Sam did Tina save', fact: 'ask' },
+          { text: '<span class="qmark">?</span>' }
+        ],
+        steps: [
+          {
+            title: 'Step 1 — Define variables and translate "altogether"',
+            highlights: ['f1'],
+            content: () =>
+              `<p class="step-explanation">
+                Let <strong>S</strong> = Sam\'s savings and <strong>T</strong> = Tina\'s savings (in dollars).
+                "Saved $3000 altogether" gives our first equation directly.
+              </p>` +
+              workArea('Equation (1)',
+                eqRow([
+                  { type: 'var-a', text: 'S' }, { type: 'plus' },
+                  { type: 'var-b', text: 'T' }, { type: 'eq' },
+                  { type: 'value', text: '$3000' }
+                ], { label: '(1)', classNames: 'is-target' })
+              )
+          },
+          {
+            title: 'Step 2 — Translate the percentage condition',
+            highlights: ['f2'],
+            content: () =>
+              `<p class="step-explanation">
+                "<strong>25% of Sam was $60 more than 15% of Tina</strong>" → 0.25 × S = 0.15 × T + 60.
+                Decimals are messy — multiply both sides by <strong>100</strong> to convert percentages to whole numbers, then divide by the gcd.
+              </p>` +
+              workArea('Clean up the percentages',
+                eqRow([
+                  { type: 'value', text: '0.25 S' }, { type: 'eq' },
+                  { type: 'value', text: '0.15 T + 60' }
+                ], { label: '(2)' }) +
+                eqRow([
+                  { type: 'var-a', text: '25 S' }, { type: 'eq' },
+                  { type: 'var-b', text: '15 T' }, { type: 'plus' },
+                  { type: 'value', text: '6000' }
+                ], { badge: '× 100', classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-a', text: '5 S' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 T' }, { type: 'plus' },
+                  { type: 'value', text: '1200' }
+                ], { label: '(2′)', badge: '÷ 5', classNames: 'is-result' })
+              ) +
+              takeaway(
+                'When you see <strong>X% of A = Y% of B + constant</strong>, multiply by 100 to ditch the decimals first. ' +
+                'Then look for a common factor and divide it out.'
+              )
+          },
+          {
+            title: 'Step 3 — Choose a strategy',
+            highlights: ['ask'],
+            content: () =>
+              strategyBanner('sub',
+                'Equation (1) is short and clean: S = $3000 − T. Substitute that into (2′) to remove S.'
+              ) +
+              `<p class="step-explanation">
+                Substitution shines when one equation can be <strong>solved for a single letter in one move</strong>. ' +
+                'Equation (1) qualifies — just rearrange.
+              </p>`
+          },
+          {
+            title: 'Step 4 — Substitute S = 3000 − T',
+            highlights: ['ask'],
+            content: () =>
+              workArea('Substitution',
+                eqRow([
+                  { type: 'var-a', text: '5 S' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 T' }, { type: 'plus' },
+                  { type: 'value', text: '1200' }
+                ], { label: '(2′)' }) +
+                eqRow([
+                  { type: 'num', text: '5' }, { type: 'op', text: '×' },
+                  { type: 'value', text: '(3000 − T)' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 T' }, { type: 'plus' },
+                  { type: 'value', text: '1200' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '15000' }, { type: 'minus' },
+                  { type: 'var-b', text: '5 T' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 T' }, { type: 'plus' },
+                  { type: 'value', text: '1200' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '15000 − 1200' }, { type: 'eq' },
+                  { type: 'var-b', text: '3 T' }, { type: 'plus' },
+                  { type: 'var-b', text: '5 T' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'value', text: '13800' }, { type: 'eq' },
+                  { type: 'var-b', text: '8 T' }
+                ], { classNames: 'is-derived' }) +
+                eqRow([
+                  { type: 'var-b', text: 'T' }, { type: 'eq' },
+                  { type: 'value', text: '$1725' }
+                ], { classNames: 'is-result' })
+              )
+          },
+          {
+            title: 'Step 5 — Compute Sam\'s savings and the difference',
+            highlights: ['ask'],
+            content: () =>
+              workArea('Sam\'s savings',
+                eqRow([
+                  { type: 'var-a', text: 'S' }, { type: 'eq' },
+                  { type: 'value', text: '$3000 − $1725' }, { type: 'eq' },
+                  { type: 'value', text: '$1275' }
+                ], { classNames: 'is-derived' })
+              ) +
+              workArea('Difference (what the question asks)',
+                eqRow([
+                  { type: 'value', text: 'T − S' }, { type: 'eq' },
+                  { type: 'value', text: '$1725 − $1275' }, { type: 'eq' },
+                  { type: 'value', text: '$450' }
+                ], { classNames: 'is-result' })
+              ) +
+              workArea('Sanity check',
+                `<p class="step-explanation">
+                  25% of $1275 = <strong>$318.75</strong>. 15% of $1725 = <strong>$258.75</strong>.<br>
+                  Difference: $318.75 − $258.75 = <strong>$60</strong> ✓
+                </p>`
+              )
+          },
+          {
+            title: 'Final Answer',
+            highlights: ['ask'],
+            isAnswer: true,
+            content: () =>
+              answerCard('Tina saved more than Sam by', '$450') +
+              takeaway(
+                '<strong>End-of-paper trap:</strong> the question asks for the <em>difference</em>, not Sam\'s or Tina\'s savings individually. ' +
+                'Always re-read the final sentence before circling your answer.'
+              )
+          }
+        ]
+      }
+
+    ];
+
+
+
+    /* =========================================================
+       RENDERING ENGINE
+       =========================================================
+       - Nav chips (one per question, color-coded by type)
+       - Question card with prose + step-by-step panel
+       - Step navigation (prev / next / pip-jump / keyboard arrows)
+       - Print mode (rendered separately by CSS @media print)
+       ========================================================= */
+
+    /* --------- App state --------- */
+    let currentQ = 0;
+    let currentStep = 0;
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    /* --------- Build the sticky question nav --------- */
+    function renderNav() {
+      const nav = document.getElementById('questionNav');
+      nav.innerHTML = QUESTIONS.map((q, i) => `
+        <button class="nav-chip" data-type="${q.type}" data-index="${i}" aria-label="Question ${q.id}: ${stripTags(q.title)}">
+          <span class="chip-num">Q${q.id}</span>
+          <span class="chip-tag">${q.tagText}</span>
+        </button>
+      `).join('');
+      nav.querySelectorAll('.nav-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.index, 10);
+          setQuestion(idx);
+        });
+      });
+    }
+
+    /* Strip HTML entities/tags for accessibility labels */
+    function stripTags(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+
+    /* --------- Activate a question --------- */
+    function setQuestion(qIndex) {
+      if (qIndex < 0 || qIndex >= QUESTIONS.length) return;
+      currentQ = qIndex;
+      currentStep = 0;
+
+      // Update nav chip "active" state
+      document.querySelectorAll('.nav-chip').forEach((btn, i) => {
+        btn.classList.toggle('active', i === qIndex);
+      });
+
+      renderQuestion();
+
+      // Smooth-scroll the question into view (non-jarring on mobile)
+      const display = document.getElementById('questionDisplay');
+      if (display && window.innerWidth < 1100) {
+        // On smaller screens, scroll so the card lands near the top
+        const top = display.getBoundingClientRect().top + window.scrollY - 16;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+
+    /* --------- Render the question card scaffold once per question --------- */
+    function renderQuestion() {
+      const q = QUESTIONS[currentQ];
+      const display = document.getElementById('questionDisplay');
+
+      // Build prose with highlightable fact spans
+      const proseHtml = q.questionParts.map(p => {
+        if (p.fact) {
+          return `<span class="fact ${p.fact}">${p.text}</span>`;
+        }
+        return p.text;
+      }).join('');
+
+      display.innerHTML = `
+        <article class="question-card" aria-live="polite">
+          <header class="qc-header">
+            <div class="qc-title-block">
+              <div class="qc-meta">
+                <span class="qc-q-number">Q${q.id}</span>
+                <span class="qc-tag ${q.type}">${q.tagText}</span>
+                <span class="qc-tag diff">${q.difficulty}</span>
+              </div>
+              <h2 class="qc-title">${q.title}</h2>
+            </div>
+          </header>
+
+          <div class="question-prose" id="questionProse">${proseHtml}</div>
+
+          <section class="steps-panel" aria-label="Step-by-step working">
+            <div class="step-progress" id="stepProgress" role="tablist"></div>
+            <div class="step-header">
+              <h3 class="step-title" id="stepTitle"></h3>
+              <span class="step-counter" id="stepCounter"></span>
+            </div>
+            <div class="step-body" id="stepBody"></div>
+            <div class="step-controls">
+              <button id="prevBtn" class="btn btn-ghost" type="button">← Previous step</button>
+              <button id="nextBtn" class="btn btn-primary" type="button">Next step →</button>
+            </div>
+          </section>
+        </article>
+      `;
+
+      // Wire up the prev / next buttons
+      document.getElementById('prevBtn').addEventListener('click', goPrev);
+      document.getElementById('nextBtn').addEventListener('click', goNext);
+
+      renderStep();
+    }
+
+    /* --------- Refresh just the step body, highlights, pips, and buttons --------- */
+    function renderStep() {
+      const q = QUESTIONS[currentQ];
+      const step = q.steps[currentStep];
+      if (!step) return;
+
+      // 1. Highlight the relevant fact spans in the question prose
+      const activeFacts = new Set(step.highlights || []);
+      document.querySelectorAll('#questionProse .fact').forEach(el => {
+        // A span has classes like "fact f1" or "fact ask"
+        const facts = ['f1', 'f2', 'f3', 'ask'];
+        const myFact = facts.find(f => el.classList.contains(f));
+        el.classList.toggle('is-active', activeFacts.has(myFact));
+      });
+
+      // 2. Update the step title and counter
+      document.getElementById('stepTitle').innerHTML = step.title;
+      document.getElementById('stepCounter').textContent =
+        `Step ${currentStep + 1} of ${q.steps.length}`;
+
+      // 3. Render the step body — re-run content() so animations restart
+      const body = document.getElementById('stepBody');
+      body.innerHTML = step.content();
+      // Force a small reflow so the fadeInUp animation re-fires reliably
+      body.style.animation = 'none';
+      // eslint-disable-next-line no-unused-expressions
+      void body.offsetHeight;
+      body.style.animation = '';
+
+      // 4. Build the progress pips
+      const progress = document.getElementById('stepProgress');
+      progress.innerHTML = q.steps.map((s, i) => {
+        let cls = 'step-pip';
+        if (i === currentStep) cls += ' current';
+        else if (i < currentStep) cls += ' done';
+        const ariaSel = i === currentStep ? 'true' : 'false';
+        return `<button class="${cls}" data-step="${i}" role="tab" aria-selected="${ariaSel}" aria-label="Jump to step ${i + 1}"></button>`;
+      }).join('');
+      progress.querySelectorAll('.step-pip').forEach(pip => {
+        pip.addEventListener('click', () => {
+          const idx = parseInt(pip.dataset.step, 10);
+          if (!isNaN(idx)) {
+            currentStep = idx;
+            renderStep();
+          }
+        });
+      });
+
+      // 5. Update prev / next disabled states + label (final step says "Done")
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      prevBtn.disabled = currentStep === 0;
+      const atLast = currentStep === q.steps.length - 1;
+      nextBtn.disabled = atLast;
+      nextBtn.textContent = atLast ? '✓ Final step' : 'Next step →';
+    }
+
+    /* --------- Navigation helpers --------- */
+    function goPrev() {
+      if (currentStep > 0) {
+        currentStep--;
+        renderStep();
+      }
+    }
+    function goNext() {
+      const q = QUESTIONS[currentQ];
+      if (currentStep < q.steps.length - 1) {
+        currentStep++;
+        renderStep();
+      }
+    }
+    function goPrevQuestion() {
+      if (currentQ > 0) setQuestion(currentQ - 1);
+    }
+    function goNextQuestion() {
+      if (currentQ < QUESTIONS.length - 1) setQuestion(currentQ + 1);
+    }
+
+    /* --------- Keyboard navigation: ←/→ for steps, Shift+←/→ for questions --------- */
+    document.addEventListener('keydown', (e) => {
+      // Don't intercept when user is typing in an input/textarea
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+
+      if (e.key === 'ArrowLeft') {
+        if (e.shiftKey) goPrevQuestion();
+        else goPrev();
+        e.preventDefault();
+      } else if (e.key === 'ArrowRight') {
+        if (e.shiftKey) goNextQuestion();
+        else goNext();
+        e.preventDefault();
+      } else if (e.key === 'Home') {
+        currentStep = 0;
+        renderStep();
+        e.preventDefault();
+      } else if (e.key === 'End') {
+        currentStep = QUESTIONS[currentQ].steps.length - 1;
+        renderStep();
+        e.preventDefault();
+      }
+    });
+
+    /* --------- Print button: expand all steps before printing --------- */
+    function setupPrintButton() {
+      const btn = document.getElementById('printBtn');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        // Browser print dialog will pick up the @media print rules,
+        // which already render every step in expanded form.
+        window.print();
+      });
+    }
+
+    /* --------- Boot the app --------- */
+    function init() {
+      renderNav();
+      setQuestion(0);
+      setupPrintButton();
+    }
+
+    // Run after DOM is parsed (the script lives at the end of body, so it's safe to run immediately)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  </script>
+</body>
+</html>
