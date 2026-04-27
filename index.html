@@ -3725,6 +3725,17 @@
       return tmp.textContent || tmp.innerText || '';
     }
 
+    /* Strip prose explanations from a step's rendered content, leaving only
+       the math (work areas, equations, bar models, ledgers, answer card).
+       Used for the "Full Workings" summary on the last step and for the
+       printed answer key, so students see the bare solution to dissect. */
+    function stripExplanations(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      tmp.querySelectorAll('.step-explanation, .takeaway, .strategy-banner').forEach(el => el.remove());
+      return tmp.innerHTML;
+    }
+
     /* --------- Activate a question --------- */
     function setQuestion(qIndex) {
       if (qIndex < 0 || qIndex >= QUESTIONS.length) return;
@@ -3820,13 +3831,15 @@
       // 3. Render the step body — re-run content() so animations restart.
       //    On the LAST step of a question, prepend a "Full Workings" summary that
       //    consolidates every preceding step so students can see the complete solution.
+      //    The summary strips out prose explanations so only the equations remain,
+      //    letting students dissect the solution themselves.
       const body = document.getElementById('stepBody');
       const isLast = currentStep === q.steps.length - 1 && q.steps.length > 1;
       if (isLast) {
         const summary = q.steps.slice(0, -1).map(s =>
           `<div class="full-workings-step">
              <h4 class="fw-step-title">${s.title}</h4>
-             ${s.content()}
+             ${stripExplanations(s.content())}
            </div>`
         ).join('');
         body.innerHTML =
@@ -3834,7 +3847,7 @@
              <span class="fw-banner">Full Workings</span>
              ${summary}
            </div>` +
-          step.content();
+          stripExplanations(step.content());
       } else {
         body.innerHTML = step.content();
       }
@@ -3993,7 +4006,7 @@
               ${q.steps.map(step => `
                 <div class="ak-step">
                   <h4 class="ak-step-title">${step.title}</h4>
-                  <div class="ak-step-body">${step.content()}</div>
+                  <div class="ak-step-body">${stripExplanations(step.content())}</div>
                 </div>
               `).join('')}
             </article>
