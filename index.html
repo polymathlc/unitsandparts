@@ -983,7 +983,46 @@
     }
 
     /* =========================================================
-       16. PRINT STYLES
+       16. FULL WORKINGS SUMMARY (shown on the last step)
+       ========================================================= */
+    .full-workings-summary {
+      margin-bottom: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+    .fw-banner {
+      display: inline-block;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      background: var(--accent-bg);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-md);
+    }
+    .full-workings-step {
+      padding: var(--space-md) 0;
+      border-top: 1px dashed var(--border-subtle);
+    }
+    .full-workings-step:first-of-type { border-top: none; padding-top: 0; }
+    .fw-step-title {
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* =========================================================
+       17. PRINT WORKSHEET (cover, questions w/ working space, answer key)
+       ========================================================= */
+    .print-worksheet { display: none; }
+
+    /* =========================================================
+       18. PRINT STYLES
        ========================================================= */
     @page { size: A4; margin: 15mm 16mm; }
     @media print {
@@ -993,42 +1032,243 @@
         --shadow-lg: none;
       }
       body { background: white; }
-      .print-btn,
-      .nav-wrapper,
-      .step-controls,
-      .step-progress { display: none !important; }
-      .question-card,
-      .primer,
-      .work-area,
-      .answer-card,
-      .takeaway,
-      .strategy-banner,
-      .steps-panel {
+
+      /* Hide the entire interactive app — print only the worksheet */
+      .polymath-header,
+      main { display: none !important; }
+
+      /* Show the print worksheet */
+      .print-worksheet { display: block !important; }
+
+      .print-worksheet * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
         box-shadow: none !important;
+      }
+
+      /* ---------- Cover page ---------- */
+      .print-cover {
+        page-break-after: always;
+        text-align: center;
+        padding-top: 30mm;
+        min-height: 240mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .print-cover .cover-logo {
+        height: 80px;
+        width: auto;
+        margin: 0 auto var(--space-lg);
+      }
+      .print-cover h1 {
+        font-size: 2.4rem;
+        font-weight: 800;
+        margin-bottom: var(--space-sm);
+        color: var(--text-primary);
+      }
+      .print-cover .cover-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-2xl);
+      }
+      .print-cover .cover-subtitle strong { color: var(--accent-deep); }
+      .cover-fields {
+        margin-top: 30mm;
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+      }
+      .cover-field {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-md);
+        font-size: 1.15rem;
+      }
+      .cover-field .cov-label {
+        font-weight: 700;
+        min-width: 90px;
+        text-align: right;
+        color: var(--text-primary);
+      }
+      .cover-field .cov-line {
+        flex: 1;
+        border-bottom: 1.5px solid var(--text-primary);
+        height: 28px;
+      }
+      .cover-instructions {
+        margin-top: auto;
+        padding-top: var(--space-2xl);
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        font-style: italic;
+      }
+
+      /* ---------- Questions section ---------- */
+      .print-q {
+        page-break-after: always;
+        page-break-inside: avoid;
+        padding-top: 4mm;
+      }
+      .print-q:last-of-type { page-break-after: always; }
+      .print-q-head {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-sm);
+        border-bottom: 2px solid var(--accent-base);
+      }
+      .print-q-head .qc-q-number {
+        font-family: var(--font-family-question);
+        font-weight: 800;
+        font-size: 1.4rem;
+        color: var(--accent-deep);
+        background: var(--accent-bg);
+        padding: 4px 12px;
+        border-radius: var(--radius-md);
+      }
+      .print-q-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .print-q-prose {
+        font-size: 1rem;
+        line-height: 1.65;
+        margin-bottom: var(--space-md);
+        padding: var(--space-md);
+        background: var(--bg-soft);
+        border-left: 3px solid var(--accent-base);
+        border-radius: var(--radius-sm);
+      }
+      .working-space {
+        position: relative;
+        border: 1.5px solid var(--border-medium);
+        border-radius: var(--radius-md);
+        min-height: 175mm;
+        padding: var(--space-md);
+        background:
+          repeating-linear-gradient(
+            transparent,
+            transparent 9mm,
+            #EEEEEA 9mm,
+            #EEEEEA 9.4mm
+          );
+      }
+      .working-space .ws-label {
+        position: absolute;
+        top: 6px;
+        left: 10px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+        background: white;
+        padding: 0 6px;
+      }
+      .answer-line {
+        margin-top: var(--space-md);
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-sm);
+      }
+      .answer-line .ans-fill {
+        flex: 1;
+        border-bottom: 1.5px solid var(--text-primary);
+        height: 22px;
+      }
+
+      /* ---------- Answer key ---------- */
+      .print-answer-key { page-break-before: always; }
+      .ak-cover {
+        text-align: center;
+        padding-top: 60mm;
+        page-break-after: always;
+      }
+      .ak-cover h1 {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: var(--accent-deep);
+        margin-bottom: var(--space-md);
+      }
+      .ak-cover p {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+      }
+      .print-ak-q {
+        page-break-inside: avoid;
+        page-break-after: always;
+      }
+      .print-ak-q:last-of-type { page-break-after: auto; }
+      .ak-q-head {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-bottom: var(--space-sm);
+        padding-bottom: var(--space-sm);
+        border-bottom: 2px solid var(--accent-base);
+      }
+      .ak-q-head .qc-q-number {
+        font-family: var(--font-family-question);
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--accent-deep);
+        background: var(--accent-bg);
+        padding: 3px 10px;
+        border-radius: var(--radius-md);
+      }
+      .ak-q-head .print-q-title {
+        font-size: 1.1rem;
+      }
+      .ak-step {
+        page-break-inside: avoid;
+        margin-top: var(--space-md);
+        padding-top: var(--space-sm);
+        border-top: 1px dashed var(--border-subtle);
+      }
+      .ak-step:first-of-type { border-top: none; padding-top: 0; }
+      .ak-step-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+      }
+      .ak-step-body { font-size: 0.9rem; }
+
+      /* Common: ensure all rendered helpers (work areas, equations, bars, ledgers, answer cards)
+         keep their colored styling in print. */
+      .print-worksheet .work-area,
+      .print-worksheet .answer-card,
+      .print-worksheet .takeaway,
+      .print-worksheet .strategy-banner,
+      .print-worksheet .ledger-card {
         background: white !important;
         page-break-inside: avoid;
       }
-      .question-card { padding: 12px 0 !important; border: none !important; }
-      .step-body { display: block !important; }
-      .step-body[data-current="false"] { display: block !important; }
-      .all-steps-print { display: block !important; }
-      .polymath-logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .nav-chip,
-      .qc-tag,
-      .qc-q-number,
-      .bar-block,
-      .bar-value,
-      .eq-row,
-      .ledger-card {
-        box-shadow: none !important;
+      .print-worksheet .answer-card {
+        background: linear-gradient(135deg, #F1F8E9, #E8F5E9) !important;
+      }
+      .print-worksheet .strategy-banner {
+        background: var(--bg-primary) !important;
+      }
+      .print-worksheet .nav-chip,
+      .print-worksheet .qc-tag,
+      .print-worksheet .qc-q-number,
+      .print-worksheet .bar-block,
+      .print-worksheet .bar-value,
+      .print-worksheet .eq-row,
+      .print-worksheet .ledger-card {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
-      .question-prose .fact { background: transparent !important; box-shadow: none !important; }
-      .question-prose .fact.is-active {
-        font-weight: 600;
-        text-decoration: underline;
-        text-decoration-color: var(--accent-base);
+      .print-worksheet .polymath-logo {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
     }
   </style>
@@ -1092,6 +1332,13 @@
     <!-- ========== ACTIVE QUESTION ========== -->
     <div id="questionDisplay"></div>
   </main>
+
+  <!-- ========== PRINT-ONLY WORKSHEET ==========
+       Built dynamically by renderPrintWorksheet(). Contains:
+         1. Cover page with Name / Class / Date fields
+         2. All 12 questions, each on its own page with ample working space
+         3. Answer key at the back (full step-by-step workings) -->
+  <div id="printWorksheet" class="print-worksheet" aria-hidden="true"></div>
 
   <script>
     /* =========================================================
@@ -3570,9 +3817,27 @@
       document.getElementById('stepCounter').textContent =
         `Step ${currentStep + 1} of ${q.steps.length}`;
 
-      // 3. Render the step body — re-run content() so animations restart
+      // 3. Render the step body — re-run content() so animations restart.
+      //    On the LAST step of a question, prepend a "Full Workings" summary that
+      //    consolidates every preceding step so students can see the complete solution.
       const body = document.getElementById('stepBody');
-      body.innerHTML = step.content();
+      const isLast = currentStep === q.steps.length - 1 && q.steps.length > 1;
+      if (isLast) {
+        const summary = q.steps.slice(0, -1).map(s =>
+          `<div class="full-workings-step">
+             <h4 class="fw-step-title">${s.title}</h4>
+             ${s.content()}
+           </div>`
+        ).join('');
+        body.innerHTML =
+          `<div class="full-workings-summary">
+             <span class="fw-banner">Full Workings</span>
+             ${summary}
+           </div>` +
+          step.content();
+      } else {
+        body.innerHTML = step.content();
+      }
       // Force a small reflow so the fadeInUp animation re-fires reliably
       body.style.animation = 'none';
       // eslint-disable-next-line no-unused-expressions
@@ -3664,11 +3929,86 @@
       });
     }
 
+    /* --------- Build the printable worksheet (cover + all questions + answer key) --------- */
+    function renderPrintWorksheet() {
+      const container = document.getElementById('printWorksheet');
+      if (!container) return;
+
+      // Plain prose for the worksheet (no fact-highlight spans)
+      const proseFor = q => q.questionParts.map(p => p.text).join('');
+
+      // ---- Cover page ----
+      const coverHtml = `
+        <section class="print-cover">
+          <img
+            src="https://dl.dropboxusercontent.com/scl/fi/h40yjlyg8ldefwfaa3dib/polymath-logo-sticker.png?rlkey=o1ra4taqy79gt9t8u096v82zj"
+            alt="Polymath Learning Centre"
+            class="cover-logo polymath-logo"
+          />
+          <h1>Simultaneous Concept Explorer</h1>
+          <p class="cover-subtitle">
+            <strong>Primary 6 Math</strong> &nbsp;|&nbsp; Solve word problems by forming &amp; manipulating two equations
+          </p>
+          <div class="cover-fields">
+            <div class="cover-field"><span class="cov-label">Name:</span><span class="cov-line"></span></div>
+            <div class="cover-field"><span class="cov-label">Class:</span><span class="cov-line"></span></div>
+            <div class="cover-field"><span class="cov-label">Date:</span><span class="cov-line"></span></div>
+          </div>
+          <p class="cover-instructions">
+            Show all your working in the spaces provided. The answer key is at the back of this booklet.
+          </p>
+        </section>`;
+
+      // ---- Questions section: every question on its own page with ample working space ----
+      const questionsHtml = QUESTIONS.map(q => `
+        <article class="print-q">
+          <header class="print-q-head">
+            <span class="qc-q-number">Q${q.id}</span>
+            <span class="print-q-title">${q.title}</span>
+          </header>
+          <p class="print-q-prose">${proseFor(q)}</p>
+          <div class="working-space" aria-label="Working space">
+            <span class="ws-label">Working</span>
+          </div>
+          <div class="answer-line">
+            <span>Answer:</span><span class="ans-fill"></span>
+          </div>
+        </article>
+      `).join('');
+
+      // ---- Answer key: full step-by-step workings for every question ----
+      const answerKeyHtml = `
+        <section class="print-answer-key">
+          <div class="ak-cover">
+            <h1>Answer Key</h1>
+            <p>Full step-by-step workings for all ${QUESTIONS.length} questions.</p>
+          </div>
+          ${QUESTIONS.map(q => `
+            <article class="print-ak-q">
+              <header class="ak-q-head">
+                <span class="qc-q-number">Q${q.id}</span>
+                <span class="print-q-title">${q.title}</span>
+              </header>
+              <p class="print-q-prose">${proseFor(q)}</p>
+              ${q.steps.map(step => `
+                <div class="ak-step">
+                  <h4 class="ak-step-title">${step.title}</h4>
+                  <div class="ak-step-body">${step.content()}</div>
+                </div>
+              `).join('')}
+            </article>
+          `).join('')}
+        </section>`;
+
+      container.innerHTML = coverHtml + questionsHtml + answerKeyHtml;
+    }
+
     /* --------- Boot the app --------- */
     function init() {
       renderNav();
       setQuestion(0);
       setupPrintButton();
+      renderPrintWorksheet();
     }
 
     // Run after DOM is parsed (the script lives at the end of body, so it's safe to run immediately)
